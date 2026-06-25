@@ -1,0 +1,146 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  background-color: white;
+  margin: 0;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border: 1px solid black;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;  
+}
+
+nav li {
+  list-style-type: none;
+}
+
+#game-area {
+  background-color: blue;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#ship {
+  display: grid;
+  width: max-content;
+  height: max-content;
+}
+
+#ship > div {
+  background-color: white;
+  border: 1px solid black;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-marker {
+  position: relative;
+}
+
+.action-marker::before {
+  content: attr(data-index); 
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: black;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  z-index: 10;
+}
+
+.character-model, .player-model {
+  position: relative;
+  display: inline-block;
+  pointer-events: auto;
+  width: 60%;
+  z-index: 2;
+}
+
+.character-model img:not([class]), .player-model img:not([class]) {
+  display: block;
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 2;       
+}
+
+.character-model img,
+.player-model img {
+  pointer-events: none;
+}
+
+
+.eye-left, .eye-right, .eyebrow-left, .eyebrow-right, .mouth, .hair-front, .hair-back {
+  position: absolute;
+  height: auto;
+}
+
+.eye-left, .eye-right {
+  width: 25%;
+  top: 50%;
+  z-index: 3;
+}
+
+.eye-left {
+  left: 18%;
+}
+
+.eye-right {
+  left: 60%;
+  transform: scaleX(-1);
+}
+
+.eyebrow-left, .eyebrow-right {
+  width: 25%;
+  top: 30%;
+  z-index: 3;
+}
+
+.eyebrow-left {
+  left: 15%;
+}
+
+.eyebrow-right {
+  left: 60%;
+  transform: scaleX(-1);
+}
+
+.mouth {
+  width: 40%;
+  top: 75%;
+  left: 30%;
+  z-index: 3;
+}
+
+.hair-back {
+  z-index: 1; 
+}
+
+.hair-front {
+  z-index: 4;
+}
