@@ -71,7 +71,7 @@ export default class Game {
 
     let currentTile = this.ship.getTile(targetPosition.x, targetPosition.y);
 
-    currentTile.setType("table");
+    currentTile.type === "floor" ? currentTile.setType("table") : currentTile.setType("floor"); 
     EventBus.emit("tile:updated", currentTile);
   }
 
@@ -97,7 +97,7 @@ export default class Game {
     const tileData = this.ship.getTile(targetPosition?.x, targetPosition?.y);
     if (!tileData) return false;
 
-    return tileData.isEntityPlaceable;
+    return tileData.getIsEntityPlaceable();
   }
   
   processGridClick(targetPosition) {

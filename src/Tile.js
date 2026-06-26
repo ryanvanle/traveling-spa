@@ -26,6 +26,12 @@ export default class Tile {
     return Array.from(this.fixtures);
   }
 
+
+  // TODO this is a whole logic since it'll be determined whats on the tile and the tile type itself.
+  getIsEntityPlaceable() {
+    return this.isEntityPlaceable; 
+  }
+
   setType(type) {
     if (!TYPE_LIST[type]) {
       console.warn("setType: invalid type", type);
