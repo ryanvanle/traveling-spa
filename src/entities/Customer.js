@@ -2,7 +2,7 @@ import CharacterModel from "../CharacterModel.js";
 import * as ModelGenerator from "../utils/ModelGenerator.js";
 import Entity from "./Entity.js";
 
-export default class Customer extends Entity{
+export default class Customer extends Entity {
   constructor(startX, startY) {
     super(startX, startY);
     this.stats = {}

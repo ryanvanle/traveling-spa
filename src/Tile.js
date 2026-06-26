@@ -14,7 +14,7 @@ export default class Tile {
     this.row = row;
     this.column = column;
     this.characters = new Set();
-    this.fixtures = new Set();
+    this.props = new Set();
     this.setType(type);
   }
 
@@ -22,8 +22,8 @@ export default class Tile {
     return Array.from(this.characters);
   }
 
-  getFixtures() {
-    return Array.from(this.fixtures);
+  getProps() {
+    return Array.from(this.props);
   }
 
 
