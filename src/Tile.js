@@ -1,12 +1,21 @@
+const TYPE_LIST = {
+  "floor": {
+    isWalkable: true, 
+    isEntityPlaceable: true,
+  },
+  "table" : {
+    isWalkable: false,
+    isEntityPlaceable: false,
+  }
+}
+
 export default class Tile {
-  constructor(row, column, isWalkable = true) {
+  constructor(row, column, type = "floor") {
     this.row = row;
     this.column = column;
-    this.isWalkable = isWalkable;
-    this.type = "floor";
-
     this.characters = new Set();
     this.fixtures = new Set();
+    this.setType(type);
   }
 
   getCharacters() {
@@ -15,5 +24,16 @@ export default class Tile {
 
   getFixtures() {
     return Array.from(this.fixtures);
+  }
+
+  setType(type) {
+    if (!TYPE_LIST[type]) {
+      console.warn("setType: invalid type", type);
+      return;
+    }
+
+    this.type = type;
+    this.isWalkable = TYPE_LIST[type].isWalkable;
+    this.isEntityPlaceable = TYPE_LIST[type].isEntityPlaceable;
   }
 }

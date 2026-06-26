@@ -12,7 +12,7 @@ export default class Ship {
     for (let row = 0; row < this.rows; row++) {
       const rowArray = [];
       for (let col = 0; col < this.columns; col++) {
-        rowArray.push(new Tile(row, col, true));
+        rowArray.push(new Tile(row, col));
       }
       grid.push(rowArray);
     }

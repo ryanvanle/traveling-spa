@@ -1,5 +1,7 @@
 import EventBus from "./EventEmitter.js";
 
+const TILE_PREFIX = "tile-type-";
+
 export default class DOMRenderer {
   constructor(targetSelector, tileSize) {
     this.root = document.querySelector(targetSelector);
@@ -12,18 +14,31 @@ export default class DOMRenderer {
 
   #setupListeners() {
     EventBus.on("entity:moved", (entity) => this.renderEntity(entity));
-    EventBus.on("queue:updated", (queue) => this.renderMarkers(queue));
+    EventBus.on("queue:updated", (queue) => this.renderMarkers(queue));    
+    EventBus.on("tile:updated", (tile) => this.renderTile(tile));
   }
 
   setupEvents() {
     if (!this.container) {
       console.warn("domRenderer setupEvents, this.container is null");
-      return;
     }
 
     this.container.addEventListener("click", (event) => {
       const targetPosition = this.getCoordsFromXY(event.clientX, event.clientY);
       EventBus.emit("input:grid-clicked", targetPosition);
+    });
+
+    this.#initDevToolsEvents();
+  }
+
+  #initDevToolsEvents() {
+
+    let buttons = document.querySelectorAll("nav ul li button");
+    buttons[0].addEventListener("click", (event) => {
+      if (event.target.tagName === "BUTTON") {
+        const actionType = event.target.dataset.action;
+        EventBus.emit("devtools:mode-changed", actionType);
+      }
     });
   }
 
@@ -34,28 +49,16 @@ export default class DOMRenderer {
     }
   }
 
-
   initGrid(shipState) {
     let shipContainer = document.createElement("div");
     shipContainer.id = "ship";
-
     shipContainer.style.gridTemplateColumns = `repeat(${shipState.columns}, ${this.tileSize}px)`;
     shipContainer.style.gridTemplateRows = `repeat(${shipState.rows}, ${this.tileSize}px)`;
 
-    function generateTile(row, column, size) {
-      let tile = document.createElement("div");
-      tile.style.width = `${size}px`;
-      tile.style.height = `${size}px`;
-
-      tile.dataset.row = row;
-      tile.dataset.column = column;
-
-      return tile;
-    }
-
     for (let i = 0; i < shipState.rows; i++) {
       for (let j = 0; j < shipState.columns; j++) {
-        let currentTile = generateTile(i, j, this.tileSize);
+        let currentTile = this.#generateTile(i, j, this.tileSize, shipState.getTile(i, j));
+
         
         if (!shipState.isWalkableTile(i, j)) {
           currentTile.classList.add("blocked");
@@ -85,6 +88,60 @@ export default class DOMRenderer {
     this.root.appendChild(shipContainer);
     this.container = shipContainer;
   }
+
+  #generateTile(row, column, size, tileData) {
+      let tile = document.createElement("div");
+      tile.style.width = `${size}px`;
+      tile.style.height = `${size}px`;
+      tile.dataset.row = row;
+      tile.dataset.column = column;
+      
+      if (!tileData) {
+        console.warn("DOMRenderer: generateTile, tileData is null", tileData);
+        return;
+      }
+
+      tile.classList.add(this.#generateTileClassName(tileData.type));
+      return tile;
+  }
+
+  #generateTileClassName(tileType) {
+    if (!tileType) {
+      console.warn("DOMRenderer: generateTileClassName is null", tileType);
+      return null;
+    }
+    
+    return `${TILE_PREFIX}${tileType}`;
+  }
+
+
+  renderTile(tileData) {
+    if (!tileData) {
+      console.warn("DOMRenderer renderTile: tileData is null", tileData);
+      return;
+    }
+
+    let tileElement = this.getTileElement(tileData.row, tileData.column);
+    if (!tileElement) {
+      console.warn("DOMRenderer renderTile: tileElement is null", tileElement);
+      return;
+    }
+
+    // only one type of class per tile at the moment
+    // TODO determine if you want to keep it like this, where a tile can only have 1 class
+    let newTileClassName = this.#generateTileClassName(tileData.type);
+
+    let tileClasslist = Array.from(tileElement.classList)
+      .filter(className => className.includes(TILE_PREFIX))
+      .filter(className => !className.includes(newTileClassName));
+
+    for (let tileClass of tileClasslist) {
+      tileElement.classList.remove(tileClass);
+    }
+
+    tileElement.classList.add(newTileClassName);
+  }
+
   
   getCoordsFromXY(clientX, clientY) {
     const rectangle = this.container.getBoundingClientRect();
@@ -124,9 +181,7 @@ export default class DOMRenderer {
     }
   }
 
-  renderMarkers(actionQueue) {
-    console.log("renderMarkers")
-
+  renderMarkers(actionQueue) { 
     // remove all markers
     const existingMarkers = this.container.querySelectorAll(".action-marker");
     for (const tileElement of existingMarkers) {
@@ -177,7 +232,7 @@ export default class DOMRenderer {
       });
     }
 
-2
+
     this.#generateCharacterDOM(model, modelContainer);
 
     return modelContainer;

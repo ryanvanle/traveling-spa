@@ -46,7 +46,6 @@ nav li {
 }
 
 #ship > div {
-  background-color: white;
   border: 1px solid black;
   width: 100%;
   height: 100%;
@@ -143,4 +142,12 @@ nav li {
 
 .hair-front {
   z-index: 4;
+}
+
+.tile-type-table {
+  background-color: brown;
+}
+
+.tile-type-floor {
+  background-color: burlywood;
 }

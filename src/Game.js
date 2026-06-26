@@ -12,9 +12,12 @@ export default class Game {
 
     this.customers = [new Customer(1,1), new Customer(2,2), new Customer(3,3)];
     this.renderer = new DOMRenderer("#game-area", 100);
-
     this.actionQueue = [];
     this.isProcessing = false;
+
+    this.previousGameMode = "";
+    this.currentGameMode = "normal"; // normal, devtools
+    this.gameModes = new Set(["normal", "devtools"]);
   }
 
   init() {
@@ -33,22 +36,75 @@ export default class Game {
     EventBus.on("input:customer-dropped", (payload) => {
       this.processCustomerDrop(payload);
     });
+
+
+    this.#initDevTools();
+
+  }
+
+  #initDevTools() {
+    EventBus.on("devtools:mode-changed", () => {
+      this.toggleDevTools();
+    });
+    
+    EventBus.on("devtools:tile", (targetPosition) => {
+      this.processTileChange(targetPosition);
+    });
+  }
+
+  toggleDevTools() {
+    let isCurrentlyDevMode = this.currentGameMode === "devtools";
+    if (isCurrentlyDevMode) {
+      this.currentGameMode = this.previousGameMode;
+      this.previousGameMode = ""; 
+    } else {
+      this.previousGameMode = this.currentGameMode;
+      this.currentGameMode = "devtools";
+    }
+  }
+
+  processTileChange(targetPosition) {
+    if (!(targetPosition && targetPosition.x != null && targetPosition.y != null)) {
+      console.warn("processTileChange, targetPosition is", targetPosition);
+      return;
+    }
+
+    let currentTile = this.ship.getTile(targetPosition.x, targetPosition.y);
+
+    currentTile.setType("table");
+    EventBus.emit("tile:updated", currentTile);
   }
 
   processCustomerDrop(payload) {
-    for (let customer of this.customers) {
-      if (customer.id === payload.id) {
-        customer.updatePosition(payload.target, this.ship);
-        break;
-      }
+    const droppedValidCustomer = this.customers.find(currnetCustomer => 
+      this.#isValidCustomerDrop(currnetCustomer, payload)
+    );
+
+    if (!droppedValidCustomer) {
+      console.debug("processCustomerDrop, invalid dropped customer", payload);
+      return;
     }
+
+    droppedValidCustomer.updatePosition(payload.target, this.ship);
   }
-    
+
+  #isValidCustomerDrop(customer, payload) {
+    if (customer.id !== payload.id) return false;
+
+    const targetPosition = payload.target;
+    if (!targetPosition) return false;
+
+    const tileData = this.ship.getTile(targetPosition?.x, targetPosition?.y);
+    if (!tileData) return false;
+
+    return tileData.isEntityPlaceable;
+  }
+  
   processGridClick(targetPosition) {
     // input checks for player character
     const isWithinBounds = this.ship.isWithinBounds(targetPosition.x, targetPosition.y);
     if (!isWithinBounds) {
-      console.log("handle input not within game bounds");
+      console.debug("processGridClick: handle input not within game bounds");
       return;
     }
 
@@ -56,7 +112,7 @@ export default class Game {
     const isDuplicateAction = this.actionQueue.some(action => action.target.x === targetPosition.x && action.target.y === targetPosition.y);
 
     if (isAtCurrentPosition || isDuplicateAction) {
-      console.log("Action Queue: duplicate action");
+      console.debug("processGridClick: Action Queue: duplicate action");
       return;
     }
   
@@ -65,6 +121,12 @@ export default class Game {
       type: isMove ? ACTION_TYPES.MOVE : ACTION_TYPES.INTERACT,
       target: targetPosition
     };
+
+    if (this.currentGameMode === "devtools") {
+      EventBus.emit("devtools:tile", targetPosition);
+      this.processQueue();
+      return;
+    }
 
     this.actionQueue.push(action);
     EventBus.emit("queue:updated", this.actionQueue);
@@ -76,7 +138,7 @@ export default class Game {
     let path = this.#findPath({x: playerPosition.x, y: playerPosition.y}, targetPosition);
 
     if (!path) {
-      console.log("executeMovement, no path found");
+      console.debug("executeMovement, no path found");
       return;
     }
 
@@ -85,9 +147,6 @@ export default class Game {
       this.player.updatePosition(nextStep, this.ship);
       await new Promise(resolve => setTimeout(resolve, this.player.stats.speed));
     }
-
-    console.log(this.ship.getTile(1,1))    
-    console.log(path);
   }
 
   async processQueue() {
@@ -100,12 +159,15 @@ export default class Game {
 
       switch (currentAction.type) {
         case ACTION_TYPES.MOVE:
-          console.log("walk");
+          console.debug("processQueue:" + currentAction.type);
           await this.executeMovement(currentAction.target);
           break;
         case ACTION_TYPES.INTERACT:
-          console.log("interact")
+          console.debug("processQueue:" + currentAction.type);
           await this.executeMovement(currentAction.target);
+          break;
+        default:
+          console.debug("processQueue default case:" + currentAction.type);
           break;
       }
 
@@ -118,21 +180,6 @@ export default class Game {
 
 
   #findPath(start, end) {
-
-    console.log("findPath")
-
-    function reconstructPath(parentMap, end) {
-      const path = [];
-      let current = end;
-
-      while (current) {
-        path.push(current);
-        current = parentMap[`${current.x},${current.y}`];
-      }
-
-      return path.reverse();
-    } 
-
     const directions = [
       [-1, 0], // left
       [1, 0], // right
@@ -152,7 +199,7 @@ export default class Game {
 
       const isEnd = currentPosition.x === end.x && currentPosition.y === end.y;
       if (isEnd) {
-        return reconstructPath(parentMap, end);
+        return this.#reconstructPath(parentMap, end);
       }
 
       for (const direction of directions) {
@@ -179,4 +226,15 @@ export default class Game {
     return null;
   }
 
+  #reconstructPath(parentMap, end) {
+    const path = [];
+    let current = end;
+
+    while (current) {
+      path.push(current);
+      current = parentMap[`${current.x},${current.y}`];
+    }
+
+    return path.reverse();
+  } 
 }
