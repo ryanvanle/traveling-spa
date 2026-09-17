@@ -4,7 +4,7 @@ import * as ModelGenerator from "../utils/ModelGenerator.js";
 
 export default class Player extends Entity {
   constructor(x, y) {
-    super(x, y); 
+    super(x, y);
 
     this.stats.speed = 100;
     this.model = new CharacterModel(true);

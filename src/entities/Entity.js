@@ -7,10 +7,10 @@ export default class Entity {
       x: startX,
       y: startY,
       prevX: null,
-      prevY: null, 
+      prevY: null,
     };
 
-    this.stats = {}; 
+    this.stats = {};
   }
 
   updatePosition(newPosition, shipState) {

@@ -1,0 +1,18 @@
+goal:
+  - create and validate the gameplay loop and ensure the concept is fun
+  - provide a framework for quick iterations on gameplay
+
+todo:
+  - machine framework
+    - placing, putting character on it, interacting with it, multiple states, full lifecycle
+  - map generation
+    - graph implementation
+    - node types
+      - Random Event
+      - Shop (with architypes)
+      - Gameplay rounds
+        - normal, special/environmental, hard
+  - Customer
+    - HP and patience States
+  - music placeholders
+    - sf3, house, lock in music, maybe happy music
