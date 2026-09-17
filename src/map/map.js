@@ -50,7 +50,13 @@ class Graph {
   }
 
   removeEdge(startNode, endNode) {
+    if (!this.graphList.has(node) || !this.graphList.has(endNode)) {
+      console.error(`Graph addEdge: input nodes are invalid`);
+      return;
+    }
 
+    this.graphList.get(startNode).delete(endNode);
+    this.graphList.get(endNode).delete(startNode);
   }
 
   printGraph() {
