@@ -9,6 +9,7 @@ class Map {
 class Graph {
   constructor(numberOfNodes) {
     this.numberOfNodes = numberOfNodes;
+    // node key, connection node set value
     this.graphList = new Map();
   }
 
@@ -71,5 +72,15 @@ class Graph {
 
       console.log(`${currentNode} -> ${output}`);
     }
+  }
+}
+
+const NODE_TYPES = ["gameplay", "shop", "event"];
+class Node {
+  constructor() {
+    this.type = "placeholder";
+    this.isStartNode = false;
+    this.isEndNode = false;
+    this.isPlayerPresent = false;
   }
 }

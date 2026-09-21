@@ -16,3 +16,4 @@ todo:
     - HP and patience States
   - music placeholders
     - sf3, house, lock in music, maybe happy music
+  - scoring system
