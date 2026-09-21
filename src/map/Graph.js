@@ -1,16 +1,10 @@
-// Adjacency List Representation of a Map
-class Map {
-  constructor() {
-
-  }
-}
-
 // Adjacency List non-directional Graph
-class Graph {
+export default class Graph {
   constructor(numberOfNodes) {
     this.numberOfNodes = numberOfNodes;
-    // node key, connection node set value
-    this.graphList = new Map();
+    
+    this.graphList = new Map(); // node key, connection node set value
+    this.labelToGraphNode = new Map();
   }
 
   addNode(node) {
@@ -20,19 +14,25 @@ class Graph {
     }
 
     this.graphList.set(node, new Set());
+    this.labelToGraphNode.set(node.label, node);
   }
 
-  addEdge(startNode, endNode) {
-    if (!this.graphList.has(node) || !this.graphList.has(endNode)) {
+  addEdge(startNodeLabel, endNodeLabel) {
+    const startNode = this.getNodeFromLabel(startNodeLabel);
+    const endNode = this.getNodeFromLabel(endNodeLabel);
+
+    if (!this.graphList.has(startNode) || !this.graphList.has(endNode)) {
       console.error(`Graph addEdge: input nodes are invalid`);
       return;
     }
 
-    this.graphList.get(startNode).push(endNode);
-    this.graphList.get(endNode).push(startNode);
+    this.graphList.get(startNode).add(endNode);
+    this.graphList.get(endNode).add(startNode);
   }
 
-  removeNode(targetNode) {
+  removeNode(targetNodeLabel) {
+    const targetNode = this.getNodeFromLabel(targetNodeLabel);
+
     if (!this.graphList.has(targetNode)) {
       console.error(`Graph removeNode: node is not in graph, ${targetNode}`);
       return;
@@ -48,10 +48,14 @@ class Graph {
 
     // remove the node from the list and all connections from the list from their maps
     this.graphList.delete(targetNode);
+    this.labelToGraphNode.delete(targetNode.label);
   }
 
-  removeEdge(startNode, endNode) {
-    if (!this.graphList.has(node) || !this.graphList.has(endNode)) {
+  removeEdge(startNodeLabel, endNodeLabel) {
+    const startNode = this.getNodeFromLabel(startNodeLabel);
+    const endNode = this.getNodeFromLabel(endNodeLabel);
+
+    if (!this.graphList.has(startNode) || !this.graphList.has(endNode)) {
       console.error(`Graph addEdge: input nodes are invalid`);
       return;
     }
@@ -66,21 +70,24 @@ class Graph {
       let currentConnections = this.graphList.get(currentNode);
       let output = "";
 
-      for (let connection of currentConnections) {
-        output += connection + " ";
+      for (let connectionNode of currentConnections) {
+        output += connectionNode.label + " ";
       }
 
-      console.log(`${currentNode} -> ${output}`);
+      console.log(`${currentNode.label} -> ${output}`);
     }
   }
-}
 
-const NODE_TYPES = ["gameplay", "shop", "event"];
-class Node {
-  constructor() {
-    this.type = "placeholder";
-    this.isStartNode = false;
-    this.isEndNode = false;
-    this.isPlayerPresent = false;
+  getNodeFromLabel(label) {
+    return this.labelToGraphNode.get(label)
+  }
+
+  getNodes() {
+    return this.graphList.keys();
+  }
+
+  // Erdos-Renyi Random Graph Generation algo
+  generateRandomGraph() {
+
   }
 }

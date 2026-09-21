@@ -6,7 +6,7 @@ class StateMachine {
 
   update(action) {
     const currentEdges = this.states[this.currentState];
-    const isValidAction = currentEdges && currentEdges[action];
+    const isValidAction = currentEdges && Object.hasOwn(currentEdges, action);
 
     if (!isValidAction) {
       console.warn("StateMachine update(): invalid state transition: ", action);
@@ -17,7 +17,7 @@ class StateMachine {
     this.currentState = nextState;
     return this.currentState;
   }
-
+  
   reset(state) {
     const isValidState = Object.hasOwn(this.states, state);
     if (!isValidState) {
@@ -56,3 +56,36 @@ class StateMachine {
 
 // action is the transition condition
 // states are the nodes
+
+const exampleStateGraph = {
+  state1: {
+    functions: {
+      onExit: () => {},
+      onEnter: () => {}
+    },
+    edges: {
+      action1: "state2",
+      action2: "state3",
+    }
+  },
+  state2: {
+    functions: {
+      onExit: () => {},
+      onEnter: () => {}
+    },
+    edges: {
+      action1: "state1",
+      action2: "state3"
+    }
+  },
+  state3: {
+    functions: {
+      onExit: () => {},
+      onEnter: () => {}
+    },
+    edges: {
+      action1: "state1",
+      action2: "state2"
+    }
+  }
+}

@@ -5,6 +5,10 @@ import DOMRenderer from './DOMRenderer.js';
 import Ship from './Ship.js';
 import { ACTION_TYPES } from './Constants.js';
 
+import Graph from './map/Graph.js';
+import Node from './map/Node.js';
+
+
 export default class Game {
   constructor() {
     this.ship = new Ship();
@@ -24,8 +28,37 @@ export default class Game {
     this.renderer.initGrid(this.ship);
     this.renderer.setupEvents();
     this.renderer.renderInitialEntities(this.player, this.customers);
-    
+  
+
+    this.#testing();
+
     this.#initGameLogic();
+  }
+
+  #testing() {
+    let g = new Graph(6);
+    let vertices = [ 'A', 'B', 'C', 'D', 'E', 'F' ];
+
+    // adding vertices
+    for (let i = 0; i < vertices.length; i++) {
+        g.addNode(new Node(vertices[i]));
+    }
+
+    // adding edges
+    g.addEdge('A', 'B');
+    g.addEdge('A', 'D');
+    g.addEdge('A', 'E');
+    g.addEdge('B', 'C');
+    g.addEdge('D', 'E');
+    g.addEdge('E', 'F');
+    g.addEdge('E', 'C');
+    g.addEdge('C', 'F');
+
+    console.log(g.printGraph());
+
+    g.removeNode('A');
+    console.log(g.printGraph());
+
   }
 
   #initGameLogic() {
