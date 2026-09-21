@@ -15,4 +15,9 @@ export default class Node {
       "y": position.y,
     }
   }
+  
+  equals(targetNode) {
+    return this.node.position.x == targetNode.position.x &&
+           this.node.position.y == targetNode.position.y;
+  }
 }

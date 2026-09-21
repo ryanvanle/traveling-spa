@@ -34,7 +34,7 @@ export default class NodeGenerator {
     const nodePositions = this.generatePoints();
     for (let i = 0; i < nodePositions.length; i++) {
       const currentPosition = nodePositions[i];
-      const currentNode = new Node(i, currentPosition.x, currentPosition.y);
+      const currentNode = new Node(`node-${i}`, currentPosition);
       nodesList.push(currentNode);
     }
 

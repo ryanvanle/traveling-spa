@@ -37,40 +37,57 @@ export default class Game {
   #testing() {
 
     // console.log("hi");
-    // let n = new NodeGenerator(25 , 400, 400, 30);
-
-    // let points = n.generateNodes();
-
-    // let canvas = document.getElementById("canvas");
-    // let canvasWidth = canvas.width;
-    // let canvasHeight = canvas.height;
-    // let ctx = canvas.getContext("2d");
-    // ctx.fillStyle='black';
-    // ctx.fillRect(0,0,canvas.width,canvas.height);
-    
-    // let canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
-
-    // function drawPixel (x, y, r, g, b, a) {
-    //     let index = (x + y * canvasWidth) * 4;
-    //     canvasData.data[index + 0] = r;
-    //     canvasData.data[index + 1] = g;
-    //     canvasData.data[index + 2] = b;
-    //     canvasData.data[index + 3] = a;
-    // }
-
-    // function updateCanvas() {
-    //   ctx.putImageData(canvasData, 0, 0);
-    // }
-
-    // for (let point of points) {
-    //   console.log(point)
-    //   drawPixel(Math.floor(point.x), Math.floor(point.y), 0, 255, 0, 255);
-    // }
-
-    // updateCanvas();
 
     let g = new Graph();
     g.generateRandomGraph();
+    
+    let canvas = document.getElementById("canvas");
+    let canvasWidth = canvas.width;
+    let canvasHeight = canvas.height;
+    let ctx = canvas.getContext("2d");
+    ctx.fillStyle='black';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    let canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+
+    function drawPixel (x, y, r, g, b, a) {
+        let index = (x + y * canvasWidth) * 4;
+        canvasData.data[index + 0] = r;
+        canvasData.data[index + 1] = g;
+        canvasData.data[index + 2] = b;
+        canvasData.data[index + 3] = a;
+    }
+
+    function updateCanvas() {
+      ctx.putImageData(canvasData, 0, 0);
+    }
+
+
+    let nodes = [...g.graphList.keys()];
+    for (let node of nodes) {
+      const x = Math.floor(node.position.x);
+      const y = Math.floor(node.position.y);
+      drawPixel(x, y, 0, 255, 0, 255);
+    }
+
+    updateCanvas();
+
+    for (let node of nodes) {
+      const x = Math.floor(node.position.x);
+      const y = Math.floor(node.position.y);
+
+      for (let outgoingNode of g.graphList.get(node).keys()) {
+        const outgoingNodeX = Math.floor(outgoingNode.position.x);
+        const outgoingNodeY = Math.floor(outgoingNode.position.y);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(ox, oy);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "blue";
+        ctx.stroke();
+      }
+    }
 
 
     // let vertices = [ 'A', 'B', 'C', 'D', 'E', 'F' ];
