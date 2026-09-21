@@ -6,7 +6,6 @@ import Ship from './Ship.js';
 import { ACTION_TYPES } from './Constants.js';
 
 import Graph from './map/Graph.js';
-import Node from './map/Node.js';
 
 
 export default class Game {
@@ -25,39 +24,76 @@ export default class Game {
   }
 
   init() {
-    this.renderer.initGrid(this.ship);
-    this.renderer.setupEvents();
-    this.renderer.renderInitialEntities(this.player, this.customers);
+    // this.renderer.initGrid(this.ship);
+    // this.renderer.setupEvents();
+    // this.renderer.renderInitialEntities(this.player, this.customers);
   
 
     this.#testing();
 
-    this.#initGameLogic();
+    // this.#initGameLogic();
   }
 
   #testing() {
-    let g = new Graph(6);
-    let vertices = [ 'A', 'B', 'C', 'D', 'E', 'F' ];
 
-    // adding vertices
-    for (let i = 0; i < vertices.length; i++) {
-        g.addNode(new Node(vertices[i]));
-    }
+    // console.log("hi");
+    // let n = new NodeGenerator(25 , 400, 400, 30);
 
-    // adding edges
-    g.addEdge('A', 'B');
-    g.addEdge('A', 'D');
-    g.addEdge('A', 'E');
-    g.addEdge('B', 'C');
-    g.addEdge('D', 'E');
-    g.addEdge('E', 'F');
-    g.addEdge('E', 'C');
-    g.addEdge('C', 'F');
+    // let points = n.generateNodes();
 
-    console.log(g.printGraph());
+    // let canvas = document.getElementById("canvas");
+    // let canvasWidth = canvas.width;
+    // let canvasHeight = canvas.height;
+    // let ctx = canvas.getContext("2d");
+    // ctx.fillStyle='black';
+    // ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    // let canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 
-    g.removeNode('A');
-    console.log(g.printGraph());
+    // function drawPixel (x, y, r, g, b, a) {
+    //     let index = (x + y * canvasWidth) * 4;
+    //     canvasData.data[index + 0] = r;
+    //     canvasData.data[index + 1] = g;
+    //     canvasData.data[index + 2] = b;
+    //     canvasData.data[index + 3] = a;
+    // }
+
+    // function updateCanvas() {
+    //   ctx.putImageData(canvasData, 0, 0);
+    // }
+
+    // for (let point of points) {
+    //   console.log(point)
+    //   drawPixel(Math.floor(point.x), Math.floor(point.y), 0, 255, 0, 255);
+    // }
+
+    // updateCanvas();
+
+    let g = new Graph();
+    g.generateRandomGraph();
+
+
+    // let vertices = [ 'A', 'B', 'C', 'D', 'E', 'F' ];
+
+    // // adding vertices
+    // for (let i = 0; i < vertices.length; i++) {
+    //     g.addNode(new Node(vertices[i]));
+    // }
+
+    // // adding edges
+    // g.addEdge('A', 'B');
+    // g.addEdge('A', 'D');
+    // g.addEdge('A', 'E');
+    // g.addEdge('B', 'C');
+    // g.addEdge('D', 'E');
+    // g.addEdge('E', 'F');
+    // g.addEdge('E', 'C');
+    // g.addEdge('C', 'F');
+
+    // console.log(g.printGraph());
+
+    // g.removeNode('A');
+    // console.log(g.printGraph());
 
   }
 

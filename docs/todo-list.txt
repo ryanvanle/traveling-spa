@@ -7,6 +7,8 @@ todo:
     - placing, putting character on it, interacting with it, multiple states, full lifecycle
   - map generation
     - graph implementation
+      - this is alot harder than i expected so much math ;-;
+    - map renderer
     - node types
       - Random Event
       - Shop (with architypes)

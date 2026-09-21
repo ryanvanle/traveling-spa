@@ -1,10 +1,13 @@
+import NodeGenerator from "./utils/NodeGenerator.js";
+
 // Adjacency List non-directional Graph
 export default class Graph {
-  constructor(numberOfNodes) {
-    this.numberOfNodes = numberOfNodes;
-    
+  constructor() {    
     this.graphList = new Map(); // node key, connection node set value
     this.labelToGraphNode = new Map();
+    
+    this.width = 1000;
+    this.height = 1000;
   }
 
   addNode(node) {
@@ -86,8 +89,26 @@ export default class Graph {
     return this.graphList.keys();
   }
 
-  // Erdos-Renyi Random Graph Generation algo
-  generateRandomGraph() {
 
+  /**
+   * Generates randomized undirected planar graph, that guarantees the all nodes are connected
+   * and a valid distance from each other  
+   */
+  generateRandomGraph() {
+    const nodeGenerator = new NodeGenerator();
+    const nodeList = nodeGenerator.generateNodes();
+
+    for (let node of nodeList) {
+      this.addNode(node);
+    }
+
+    console.log(this.graphList);
+
+
+    // generate nodes at random positions (Poisson Disk Sampling)
+    // generate VALID edges (Deluanay Triangulation)
+    // calculate minimum spanning tree to ensure all nodes are connected and prune edges
+    // add back prune edges with set probablity return
+    // return map 
   }
 }
