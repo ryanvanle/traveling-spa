@@ -3,7 +3,7 @@ import Delaunator from "./utils/libraries/Delaunator.js";
 
 // Adjacency List non-directional Graph
 export default class Graph {
-  constructor() {    
+  constructor() {
     this.graphList = new Map(); // node key, connection node set value
     this.labelToGraphNode = new Map();
     this.width = 1000;
@@ -81,17 +81,55 @@ export default class Graph {
     }
   }
 
+  containsNodeFromLabel(label) {
+    return this.graphList.has(this.getNodeFromLabel(label));
+  }
+
   getNodeFromLabel(label) {
     return this.labelToGraphNode.get(label)
   }
 
   getNodes() {
-    return this.graphList.keys();
+    return Array.from(this.graphList.keys());
+  }
+
+  getEdgesFromLabel(label) {
+    const node = this.getNodeFromLabel(label);
+    return this.graphList.get(node);
+  }
+
+  getEdges(node) {
+    return this.graphList.get(node);
+  }
+
+  getAllEdges() {
+    const edges = []; // {source: node, destination: node}
+    const seenEdges = new Set();
+
+    for (const [currentSourceNode, currentEdgeSet] of this.graphList.entries()) {
+      for (const destinationNode of currentEdgeSet) {
+
+        // undirected so we just need one way
+        const edgeKey = currentSourceNode.id < destinationNode.id
+          ? `${currentSourceNode.id}-${destinationNode.id}`
+          : `${destinationNode.id}-${currentSourceNode.id}`;
+
+          if (!seenEdges.has(edgeKey)) {
+            seenEdges.add(edgeKey);
+            edges.push({
+              source: currentSourceNode,
+              destination: destinationNode
+            });
+          }
+      }
+    }
+
+    return edges;
   }
 
   /**
    * Generates randomized undirected planar graph, that guarantees the all nodes are connected
-   * and a valid distance from each other  
+   * and a valid distance from each other
    */
   generateRandomGraph() {
     const nodeGenerator = new NodeGenerator(30, 400, 400, 30);
@@ -111,7 +149,7 @@ export default class Graph {
 
     // generate all possible triangles from Delaunay triangulation
     const triangleCoordinates = this.#generateTriangles(pointList);
-  
+
     // connect the triangle point to each other
     for (let trianglePoints of triangleCoordinates) {
       let coordinateOne = JSON.stringify(trianglePoints[0]);
@@ -128,12 +166,38 @@ export default class Graph {
     }
 
     // calculate spanning tree to ensure all nodes are connected and prune edges
-    this.#generateSpanningTree(nodeList.length, sourceNode);
+    const allPossibleRemovedEdges = this.#generateSpanningTree();
+    console.log(allPossibleRemovedEdges.length, this.getAllEdges().length);
 
-    // add back prune edges with set probablity return
+    console.log("before");
+    this.printGraph();
+    console.log("before");
 
-    // this.printGraph()
-    // return map 
+    const PROBABILITY_TO_REMOVE = 100;
+    for (const currentEdge of allPossibleRemovedEdges) {
+      if (this.#generateChance(PROBABILITY_TO_REMOVE)) {
+        this.removeEdge(currentEdge.source.label, currentEdge.destination.label);
+      }
+    }
+
+    console.log("after");
+    this.printGraph();
+    console.log("after");
+  }
+
+
+  /**
+   * returns true or false based on the given percentage chance
+   * @param {number} percentage - percent change of returning true (0 - 100);
+   * @returns {boolean}
+   */
+  #generateChance(percentage = 50) {
+    if (percentage < 0 || percentage > 100) {
+      console.error("#generateChance: invalid percentage", percentage);
+    }
+
+    const threshold = percentage / 100;
+    return Math.random() < threshold;
   }
 
   #generateTriangles(pointList) {
@@ -158,7 +222,99 @@ export default class Graph {
     return triangleCoordinates;
   }
 
-  #generateSpanningTree(nodeLength, sourceNode) {
-    let queue = []; 
+
+  /**
+   * Kruskal Algorithm for unweighted spanning tree.
+   * @returns removedEdges array [{source: Node, destination: Node}, ...];
+   */
+  #generateSpanningTree() {
+    const nodes = this.getNodes();
+    const numberOfNodes = nodes.length;
+
+    // mapping for DisjointSet
+    const nodeToIndex = new Map();
+    nodes.forEach((node, index) => nodeToIndex.set(node, index));
+
+    // get edges
+    const edges = this.getAllEdges();
+
+    // "sort" the edges, they all have the same weight
+    this.#shuffleArray(edges);
+
+    const dsu = new DisjointSet(numberOfNodes);
+    const removedEdges = [];
+    let edgesAddedCount = 0;
+
+    for (let i = 0; i < edges.length; i++) {
+      const currentEdge = edges[i];
+      if (edgesAddedCount === numberOfNodes - 1) {
+        removedEdges.push(...edges.slice(i));
+        break;
+      }
+
+      const sourceIndex = nodeToIndex.get(currentEdge.source);
+      const destinationIndex = nodeToIndex.get(currentEdge.destination);
+      if (dsu.union(sourceIndex, destinationIndex)) {
+        edgesAddedCount++;
+      } else {
+        removedEdges.push(currentEdge);
+      }
+    }
+
+    console.log(removedEdges, "HEREEE HE HEREE HE")
+    return removedEdges;
+  }
+
+  /**
+   * in-place Fisher–Yates (aka Knuth) Shuffle.
+   * @param {any} array
+   */
+  #shuffleArray(array) {
+    let currentIndex = array.length;
+
+    while (currentIndex != 0) {
+      let randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+  }
+}
+
+class DisjointSet {
+  constructor(size) {
+    this.parent = Array.from({length: size}, (_, i) => i);
+    this.rank = new Array(size).fill(0);
+  }
+
+  find(i) {
+    if (this.parent[i] === undefined) {
+      return null;
+    }
+
+    if (this.parent[i] === i) {
+      return i;
+    }
+
+    this.parent[i] = this.find(this.parent[i]);
+    return this.parent[i];
+  }
+
+  union(i, j) {
+    const rootI = this.find(i);
+    const rootJ = this.find(j);
+
+    if (rootI === rootJ)
+      return false;
+
+    if (this.rank[rootI] < this.rank[rootJ]) {
+      this.parent[rootI] = rootJ;
+    } else if (this.rank[rootI] > this.rank[rootJ]) {
+      this.parent[rootJ] = rootI;
+    } else {
+      this.parent[rootJ] = rootI;
+      this.rank[rootI]++;
+    }
+
+    return true;
   }
 }
