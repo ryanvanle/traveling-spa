@@ -1,20 +1,27 @@
 import EventBus from './EventEmitter.js';
 import Player from './entities/Player.js';
 import Customer from './entities/Customer.js';
-import DOMRenderer from './DOMRenderer.js';
+
+import DOMGameRenderer from './renderers/DOMGameRenderer.js';
+import DOMMapRenderer from './renderers/DOMMapRenderer.js';
+
 import Ship from './Ship.js';
 import { ACTION_TYPES } from './Constants.js';
 
 import Graph from './map/Graph.js';
+import WorldMap from './map/WorldMap.js';
 
+const DEV_TOOLS_FLAG = true;
 
 export default class Game {
   constructor() {
     this.ship = new Ship();
     this.player = new Player(0, 0);
+    this.worldMap = new WorldMap();
 
     this.customers = [new Customer(1,1), new Customer(2,2), new Customer(3,3)];
-    this.renderer = new DOMRenderer("#game-area", 100);
+    this.gameRenderer = new DOMGameRenderer(100);
+    this.worldMapRenderer = new DOMMapRenderer();
     this.actionQueue = [];
     this.isProcessing = false;
 
@@ -24,95 +31,49 @@ export default class Game {
   }
 
   init() {
-    // this.renderer.initGrid(this.ship);
-    // this.renderer.setupEvents();
-    // this.renderer.renderInitialEntities(this.player, this.customers);
-  
+    this.gameRenderer.init(this.ship, this.player, this.customers);
+    this.worldMapRenderer.init(this.worldMap);
 
     this.#testing();
-
-    // this.#initGameLogic();
+    this.#initGameLogic();
   }
 
   #testing() {
 
-    // console.log("hi");
+    if (!DEV_TOOLS_FLAG) {
+      return;
+    }
 
     let g = new Graph();
     g.generateRandomGraph();
-    
-    let canvas = document.getElementById("canvas");
-    let canvasWidth = canvas.width;
-    let canvasHeight = canvas.height;
-    let ctx = canvas.getContext("2d");
-    ctx.fillStyle='black';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    
-    let canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 
-    function drawPixel (x, y, r, g, b, a) {
-        let index = (x + y * canvasWidth) * 4;
-        canvasData.data[index + 0] = r;
-        canvasData.data[index + 1] = g;
-        canvasData.data[index + 2] = b;
-        canvasData.data[index + 3] = a;
-    }
-
-    function updateCanvas() {
-      ctx.putImageData(canvasData, 0, 0);
-    }
-
-
-    let nodes = [...g.graphList.keys()];
-    for (let node of nodes) {
-      const x = Math.floor(node.position.x);
-      const y = Math.floor(node.position.y);
-      drawPixel(x, y, 0, 255, 0, 255);
-    }
-
-    updateCanvas();
-
-    for (let node of nodes) {
-      const x = Math.floor(node.position.x);
-      const y = Math.floor(node.position.y);
-
-      for (let outgoingNode of g.graphList.get(node).keys()) {
-        const outgoingNodeX = Math.floor(outgoingNode.position.x);
-        const outgoingNodeY = Math.floor(outgoingNode.position.y);
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(ox, oy);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "blue";
-        ctx.stroke();
-      }
-    }
-
-
-    // let vertices = [ 'A', 'B', 'C', 'D', 'E', 'F' ];
-
-    // // adding vertices
-    // for (let i = 0; i < vertices.length; i++) {
-    //     g.addNode(new Node(vertices[i]));
+    // let nodes = [...g.graphList.keys()];
+    // for (let node of nodes) {
+    //   const x = Math.floor(node.position.x);
+    //   const y = Math.floor(node.position.y);
     // }
 
-    // // adding edges
-    // g.addEdge('A', 'B');
-    // g.addEdge('A', 'D');
-    // g.addEdge('A', 'E');
-    // g.addEdge('B', 'C');
-    // g.addEdge('D', 'E');
-    // g.addEdge('E', 'F');
-    // g.addEdge('E', 'C');
-    // g.addEdge('C', 'F');
 
-    // console.log(g.printGraph());
+    // for (let node of nodes) {
+    //   const x = Math.floor(node.position.x);
+    //   const y = Math.floor(node.position.y);
 
-    // g.removeNode('A');
-    // console.log(g.printGraph());
+    //   for (let outgoingNode of g.graphList.get(node).keys()) {
+    //     const outgoingNodeX = Math.floor(outgoingNode.position.x);
+    //     const outgoingNodeY = Math.floor(outgoingNode.position.y);
 
+    //     ctx.beginPath();
+    //     ctx.moveTo(x, y);
+    //     ctx.lineTo(outgoingNodeX, outgoingNodeY);
+    //     ctx.lineWidth = 1;
+    //     ctx.strokeStyle = "blue";
+    //     ctx.stroke();
+    //   }
   }
+
+
+
+  
 
   #initGameLogic() {
     EventBus.on("input:grid-clicked", (targetPosition) => {

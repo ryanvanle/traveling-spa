@@ -3,11 +3,13 @@ import Delaunator from "./utils/libraries/Delaunator.js";
 
 // Adjacency List non-directional Graph
 export default class Graph {
-  constructor() {
+  constructor(width, height, numberOfNodes = 50) {
     this.graphList = new Map(); // node key, connection node set value
     this.labelToGraphNode = new Map();
-    this.width = 1000;
-    this.height = 1000;
+
+    this.width = width;
+    this.height = height;
+    this.numberOfNodes = numberOfNodes;
   }
 
   addNode(node) {
@@ -132,13 +134,19 @@ export default class Graph {
    * and a valid distance from each other
    */
   generateRandomGraph() {
-    const nodeGenerator = new NodeGenerator(30, 400, 400, 30);
+    const nodeGenerator = new NodeGenerator(this.numberOfNodes, this.width, this.height, 30);
     const nodeList = nodeGenerator.generateNodes();
+
+    // TODO: reset graph data structures
+    
     const pointList = [];
     const pointToNode = {};
 
-    const sourceNode = nodeList[0];
-    const endNode = nodeList[nodeList.length - 1];
+    this.sourceNode = nodeList[0];
+    this.sourceNode.isStartNode = true;
+
+    this.endNode = nodeList[nodeList.length - 1];
+    this.endNode.isEndNode = true;
 
     // add nodes to graph
     for (let node of nodeList) {
@@ -167,24 +175,13 @@ export default class Graph {
 
     // calculate spanning tree to ensure all nodes are connected and prune edges
     const allPossibleRemovedEdges = this.#generateSpanningTree();
-    console.log(allPossibleRemovedEdges.length, this.getAllEdges().length);
-
-    console.log("before");
-    this.printGraph();
-    console.log("before");
-
-    const PROBABILITY_TO_REMOVE = 100;
+    const PROBABILITY_TO_REMOVE = 35;
     for (const currentEdge of allPossibleRemovedEdges) {
       if (this.#generateChance(PROBABILITY_TO_REMOVE)) {
         this.removeEdge(currentEdge.source.label, currentEdge.destination.label);
       }
     }
-
-    console.log("after");
-    this.printGraph();
-    console.log("after");
   }
-
 
   /**
    * returns true or false based on the given percentage chance

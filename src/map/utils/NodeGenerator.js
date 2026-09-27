@@ -6,8 +6,7 @@ import Node from "../Node.js";
  * https://editor.p5js.org/codingtrain/sketches/4N78DFCXN
  */
 export default class NodeGenerator {
-  constructor(totalNodes = 100, width = 400, height = 400, radius = 30) {
-
+  constructor(totalNodes = 100, width = 400, height = 400, radius = 30) {1
     this.width = width;
     this.height = height;
     this.radius = radius;

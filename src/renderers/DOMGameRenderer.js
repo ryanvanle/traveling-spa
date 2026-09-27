@@ -1,10 +1,11 @@
-import EventBus from "./EventEmitter.js";
+import EventBus from "../EventEmitter.js";
 
+const CONTAINER_TAG = "#game-area";
 const TILE_PREFIX = "tile-type-";
 
-export default class DOMRenderer {
-  constructor(targetSelector, tileSize) {
-    this.root = document.querySelector(targetSelector);
+export default class DOMGameRenderer {
+  constructor(tileSize) {
+    this.root = document.querySelector(CONTAINER_TAG);
     this.tileSize = tileSize;
     this.container = null;
     this.entityElements = new Map();
@@ -18,9 +19,16 @@ export default class DOMRenderer {
     EventBus.on("tile:updated", (tile) => this.renderTile(tile));
   }
 
+  // called by client to setup event after game is loaded.
+  init(ship, player, customers) {
+    this.initGrid(ship);
+    this.setupEvents();
+    this.renderInitialEntities(player, customers)
+  }
+
   setupEvents() {
     if (!this.container) {
-      console.warn("domRenderer setupEvents, this.container is null");
+      console.warn("DOMGameRenderer setupEvents, this.container is null");
     }
 
     this.container.addEventListener("click", (event) => {
@@ -57,30 +65,7 @@ export default class DOMRenderer {
 
     for (let i = 0; i < shipState.rows; i++) {
       for (let j = 0; j < shipState.columns; j++) {
-        let currentTile = this.#generateTile(i, j, this.tileSize, shipState.getTile(i, j));
-
-        
-        if (!shipState.isWalkableTile(i, j)) {
-          currentTile.classList.add("blocked");
-        }
-
-        currentTile.addEventListener("dragover", (event) => {
-          event.preventDefault(); 
-        });
-
-        currentTile.addEventListener("drop", (event) => {
-          event.preventDefault();
-          
-          const entityId = event.dataTransfer.getData("text/plain");
-          
-          const targetPosition = {
-            x: parseInt(currentTile.dataset.row),
-            y: parseInt(currentTile.dataset.column)
-          };
-
-          EventBus.emit("input:customer-dropped", { id: entityId, target: targetPosition });
-        });
-
+        let currentTile = this.#generateTile(i, j, this.tileSize, shipState.getTile(i, j), shipState.isWalkableTile(i, j));
         shipContainer.appendChild(currentTile);
       }
     }
@@ -89,7 +74,7 @@ export default class DOMRenderer {
     this.container = shipContainer;
   }
 
-  #generateTile(row, column, size, tileData) {
+  #generateTile(row, column, size, tileData, isWalkableTile) {
       let tile = document.createElement("div");
       tile.style.width = `${size}px`;
       tile.style.height = `${size}px`;
@@ -97,33 +82,52 @@ export default class DOMRenderer {
       tile.dataset.column = column;
       
       if (!tileData) {
-        console.warn("DOMRenderer: generateTile, tileData is null", tileData);
+        console.warn("DOMGameRenderer: generateTile, tileData is null", tileData);
         return;
       }
 
+      if (!isWalkableTile) {
+        currentTile.classList.add("blocked");
+      }
+
       tile.classList.add(this.#generateTileClassName(tileData.type));
+      this.#addTileEventListeners(tile);
       return tile;
+  }
+
+  #addTileEventListeners(tile) {
+    tile.addEventListener("dragover", (event) => {
+      event.preventDefault(); 
+    });
+
+    tile.addEventListener("drop", (event) => {
+      event.preventDefault();
+
+      const entityId = event.dataTransfer.getData("text/plain");
+      const targetPosition = { x: parseInt(tile.dataset.row), y: parseInt(tile.dataset.column) };
+      EventBus.emit("input:customer-dropped", { id: entityId, target: targetPosition });
+    
+    });
   }
 
   #generateTileClassName(tileType) {
     if (!tileType) {
-      console.warn("DOMRenderer: generateTileClassName is null", tileType);
+      console.warn("DOMGameRenderer: generateTileClassName is null", tileType);
       return null;
     }
     
     return `${TILE_PREFIX}${tileType}`;
   }
 
-
   renderTile(tileData) {
     if (!tileData) {
-      console.warn("DOMRenderer renderTile: tileData is null", tileData);
+      console.warn("DOMGameRenderer renderTile: tileData is null", tileData);
       return;
     }
 
     let tileElement = this.getTileElement(tileData.row, tileData.column);
     if (!tileElement) {
-      console.warn("DOMRenderer renderTile: tileElement is null", tileElement);
+      console.warn("DOMGameRenderer renderTile: tileElement is null", tileElement);
       return;
     }
 
@@ -141,7 +145,6 @@ export default class DOMRenderer {
 
     tileElement.classList.add(newTileClassName);
   }
-
   
   getCoordsFromXY(clientX, clientY) {
     const rectangle = this.container.getBoundingClientRect();

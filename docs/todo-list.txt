@@ -8,6 +8,7 @@ todo:
   - map generation
     - graph implementation
       - this is alot harder than i expected so much math ;-;
+        - implemented a version but will need to adjust.
     - map renderer
     - node types
       - Random Event
