@@ -138,7 +138,7 @@ export default class Graph {
     const nodeList = nodeGenerator.generateNodes();
 
     // TODO: reset graph data structures
-    
+
     const pointList = [];
     const pointToNode = {};
 
@@ -258,7 +258,6 @@ export default class Graph {
       }
     }
 
-    console.log(removedEdges, "HEREEE HE HEREE HE")
     return removedEdges;
   }
 

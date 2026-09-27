@@ -41,9 +41,7 @@ export default class DOMMapRenderer {
     worldMapContainer.id = "map";
 
     const islands = worldMap.getIslands();
-    const edges = worldMap.getEdges();
-
-
+    const edges = worldMap.getAllEdges();
 
     this.root.appendChild(worldMapContainer);
     this.container = worldMapContainer;

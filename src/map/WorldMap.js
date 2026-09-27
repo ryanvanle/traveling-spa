@@ -3,14 +3,14 @@ import Graph from "./Graph.js"
 export default class WorldMap {
   constructor() {
     this.graph = new Graph();
-    this.graph.generateRandomGraph();    
+    this.graph.generateRandomGraph();
   }
 
   getIslands() {
-    return this.graph.getNodes(); 
+    return this.graph.getNodes();
   }
 
-  getEdges() {
-    return this.graph.getEdges();
+  getAllEdges() {
+    return this.graph.getAllEdges();
   }
  }
