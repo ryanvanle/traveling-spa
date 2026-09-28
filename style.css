@@ -154,8 +154,7 @@ nav li {
 
 #map {
   position: absolute;
-  width: 75vw;
-  height: 80vh;
+  padding: 25px;
   top: 10%;
   left: 0;
   z-index: 500;
@@ -163,9 +162,12 @@ nav li {
 }
 
 #world-map-content {
-  width: 100%;
-  height: 100%;
-  background-color: blue;
+  width: 600px;
+  height: 400px;
+  /* background-color: blue; */
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .island {
@@ -175,6 +177,9 @@ nav li {
   position: absolute;
   background-color: white;
   z-index: 1000;
+  border-radius: 100%;
+  border: 2px black solid;
+  transform: translate(-50%, -50%);
 }
 
 .edge {

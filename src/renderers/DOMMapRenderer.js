@@ -72,8 +72,8 @@ export default class DOMMapRenderer {
     const islandElement = document.createElement("div");
     islandElement.classList.add("island");
 
-    islandElement.style.top = `${parseInt(island.position.x)}px`;
-    islandElement.style.left = `${parseInt(island.position.y)}px`;
+    islandElement.style.top = `${island.position.y}px`;
+    islandElement.style.left = `${island.position.x}px`;
 
     // console.log("generateIsland", island);
     return islandElement;

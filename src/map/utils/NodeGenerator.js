@@ -1,150 +1,74 @@
 import Node from "../Node.js";
 
 /**
- * implementation of Poisson-disc Sampling
- * https://www.youtube.com/watch?v=flQgnCUxHlw
- * https://editor.p5js.org/codingtrain/sketches/4N78DFCXN
+ * implementation of interpretation of ftl map generation
+ * https://www.reddit.com/r/ftlgame/comments/fcfdt3/how_the_beacon_map_is_generated/
  */
 export default class NodeGenerator {
-  constructor(totalNodes = 100, width = 400, height = 400, radius = 30) {1
-    this.width = width;
-    this.height = height;
-    this.radius = radius;
-    this.sampleLimit = 30;
-    this.totalNodes = totalNodes;
-
-    this.cellSize = this.radius / Math.sqrt(2);
-
-    this.activePoints = [];
-    this.ordered = [];
-
-    this.cols = Math.floor(this.width / this.cellSize);
-    this.rows = Math.floor(this.height / this.cellSize);
-
-    // step 0, init grid
-    this.grid = [];
-    for (let i = 0; i < this.cols * this.rows; i++) {
-      this.grid[i] = undefined;
-    }
+  constructor(rows = 4, cols = 6, cellSize = 100) {
+    this.cols = cols;
+    this.rows = rows;
+    this.cellSize = cellSize;
+    this.grid = Array.from(Array(this.rows), () => new Array(this.cols));
   }
 
   generateNodes() {
     const nodesList = [];
     const nodePositions = this.generatePoints();
+
     for (let i = 0; i < nodePositions.length; i++) {
-      const currentPosition = nodePositions[i];
-      const currentNode = new Node(`node-${i}`, currentPosition);
-      nodesList.push(currentNode);
+      for (let j = 0; j < nodePositions[0].length; j++) {
+        const currentPosition = nodePositions[i][j];
+        const currentNode = new Node(`node-${i}-${j}`, currentPosition);
+        nodesList.push(currentNode);
+      }
     }
 
     return nodesList;
   }
 
-
   generatePoints() {
-    // reset
-    this.activePoints = [];
-    this.ordered = [];
-    this.grid = [];
-    for (let i = 0; i < this.cols * this.rows; i++) {
-      this.grid[i] = undefined;
-    }
+    this.grid = Array.from(Array(this.rows), () => new Array(this.cols));
 
-    
-    // step 1 push first point into active
-    let x = this.width / 2;
-    let y = this.height / 2;
-    let position = {
-      "x": x, 
-      "y": y
-    };
-
-    let i = Math.floor(x / this.cellSize);
-    let j = Math.floor(y / this.cellSize);
-
-    this.grid[i + j * this.cols] = position;
-
-    this.activePoints.push(position);
-    this.ordered.push(position);
-  
-    // step 2 generate all the other points
-    while (this.activePoints.length > 0 && this.ordered.length < this.totalNodes) {
-      let randomIndex = Math.floor(Math.random() * this.activePoints.length);
-      let position = this.activePoints[randomIndex];
-      let isValidCandidate = false;
-
-      // step 3 pick a random point in a random direction
-      for (let sampleAttempt = 0; sampleAttempt < this.sampleLimit; sampleAttempt++) {
-        let angle = Math.random() * Math.PI * 2;
-        let distance = this.radius + Math.random() * this.radius;
-
-        let direction = {
-          x: Math.sin(angle), 
-          y: Math.cos(angle)
-        };
-
-        let candidate = {
-          x: position.x + direction.x * distance,
-          y: position.y + direction.y * distance,
-        }
-
-        let col = Math.floor(candidate.x / this.cellSize);
-        let row = Math.floor(candidate.y / this.cellSize);
-
-        // step 4 see if it is a valid position
-        if (this.#isValid(candidate, col, row)) {
-          isValidCandidate = true;
-          this.grid[col + row * this.cols] = candidate;
-          
-          // step 4.1 add to point if valid 
-          this.activePoints.push(candidate);
-          this.ordered.push(candidate);
-          break;
-        }
-      }
-
-      // step 4.2 if not valid remove it as a possible point
-      if (!isValidCandidate) {
-        this.activePoints.splice(randomIndex, 1);
+    // per each cell spawn or dont spawn an island, and place it in a random position within in the cell offset by the cell's position
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        let randomPosition = this.generateRandomPosition(i, j, this.cellSize);
+        this.grid[i][j] = randomPosition;
       }
     }
-    
-    return this.ordered;
+
+    return this.grid;
   }
 
-  #isValid(candidate, col, row) {
-    let isWithinBounds = (
-      col > -1 &&
-      row > -1 &&
-      col < this.cols &&
-      row < this.rows &&
-      !this.grid[col + row * this.cols]
-    );
+  generateRandomPosition(rowIndex, colIndex, cellSize) {
+    const PADDING = 5;
 
-    if (!isWithinBounds) {
-      return false;
+    const minOffset = PADDING;
+    const maxOffset = cellSize - PADDING;
+
+    const rowOffset = rowIndex * cellSize;
+    const colOffset = colIndex * cellSize;
+
+    const randomPosition = {
+      x: this.getRandomInt(minOffset, maxOffset) + colOffset,
+      y: this.getRandomInt(minOffset, maxOffset) + rowOffset
     }
 
-    // check its grid neighbors
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        let index = (col + i) + (row + j) * this.cols;
-        let neighbor = this.grid[index];
-        if (neighbor) {
-          let distance = {
-            x: candidate.x - neighbor.x,
-            y: candidate.y - neighbor.y
-          }
+    return randomPosition;
+  }
 
-          let squareDistance = (distance.x * distance.x) + (distance.y * distance.y);
-          if (squareDistance < this.radius * this.radius) {
-            return false;
-          }
-
-        }
-      }
-    }
-    return true;
+  /**
+   * Returns a random integer between min (inclusive) and max (inclusive).
+   * The value is no lower than min (or the next integer greater than min
+   * if min isn't an integer) and no greater than max (or the next integer
+   * lower than max if max isn't an integer).
+   * Using Math.round() will give you a non-uniform distribution!
+   */
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
 

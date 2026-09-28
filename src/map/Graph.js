@@ -3,15 +3,15 @@ import Delaunator from "./utils/libraries/Delaunator.js";
 
 // Adjacency List non-directional Graph
 export default class Graph {
-  constructor(width, height, numberOfNodes = 50) {
+  constructor(rows = 4, cols = 6, cellSize = 100) {
     this.graphList = new Map(); // node key, connection node set value
     this.labelToGraphNode = new Map();
 
-    this.width = width;
-    this.height = height;
-    this.numberOfNodes = numberOfNodes;
+    this.rows = rows;
+    this.cols = cols;
+    this.cellSize = cellSize;
 
-    console.log("constructor", this.width, this.height);
+    // console.log("constructor", this.width, this.height);
   }
 
   addNode(node) {
@@ -136,10 +136,8 @@ export default class Graph {
    * and a valid distance from each other
    */
   generateRandomGraph() {
-    console.log("generateRandomGraph", this.width, this.height);
-
-
-    const nodeGenerator = new NodeGenerator(this.numberOfNodes, this.width, this.height, 30);
+    // console.log("generateRandomGraph", this.width, this.height);
+    const nodeGenerator = new NodeGenerator();
     const nodeList = nodeGenerator.generateNodes();
 
     const pointList = [];
@@ -157,6 +155,9 @@ export default class Graph {
       pointList.push(node.position);
       pointToNode[JSON.stringify(node.position)] = node; // this is so sus lol, TODO: maybe not use json.stringify perhaps
     }
+
+    console.log("here", this.graphList);
+    console.log(pointList);
 
     // generate all possible triangles from Delaunay triangulation
     const triangleCoordinates = this.#generateTriangles(pointList);
@@ -176,9 +177,10 @@ export default class Graph {
       this.addEdge(nodeThree.label, nodeTwo.label);
     }
 
+
     // calculate spanning tree to ensure all nodes are connected and prune edges
     const allPossibleRemovedEdges = this.#generateSpanningTree();
-    const PROBABILITY_TO_REMOVE = 35;
+    const PROBABILITY_TO_REMOVE = 0;
     for (const currentEdge of allPossibleRemovedEdges) {
       if (this.#generateChance(PROBABILITY_TO_REMOVE)) {
         this.removeEdge(currentEdge.source.label, currentEdge.destination.label);
