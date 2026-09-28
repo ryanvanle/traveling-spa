@@ -49,6 +49,7 @@ export default class NodeGenerator {
     for (let i = 0; i < this.cols * this.rows; i++) {
       this.grid[i] = undefined;
     }
+
     
     // step 1 push first point into active
     let x = this.width / 2;

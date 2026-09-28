@@ -10,6 +10,8 @@ export default class Graph {
     this.width = width;
     this.height = height;
     this.numberOfNodes = numberOfNodes;
+
+    console.log("constructor", this.width, this.height);
   }
 
   addNode(node) {
@@ -134,10 +136,11 @@ export default class Graph {
    * and a valid distance from each other
    */
   generateRandomGraph() {
+    console.log("generateRandomGraph", this.width, this.height);
+
+
     const nodeGenerator = new NodeGenerator(this.numberOfNodes, this.width, this.height, 30);
     const nodeList = nodeGenerator.generateNodes();
-
-    // TODO: reset graph data structures
 
     const pointList = [];
     const pointToNode = {};

@@ -151,3 +151,32 @@ nav li {
 .tile-type-floor {
   background-color: burlywood;
 }
+
+#map {
+  position: absolute;
+  width: 75vw;
+  height: 80vh;
+  top: 10%;
+  left: 0;
+  z-index: 500;
+  background-color: #e7d6bd;
+}
+
+#world-map-content {
+  width: 100%;
+  height: 100%;
+  background-color: blue;
+}
+
+.island {
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  position: absolute;
+  background-color: white;
+  z-index: 1000;
+}
+
+.edge {
+  
+}

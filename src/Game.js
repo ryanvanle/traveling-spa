@@ -8,7 +8,6 @@ import DOMMapRenderer from './renderers/DOMMapRenderer.js';
 import Ship from './Ship.js';
 import { ACTION_TYPES } from './Constants.js';
 
-import Graph from './map/Graph.js';
 import WorldMap from './map/WorldMap.js';
 
 const DEV_TOOLS_FLAG = true;
@@ -39,41 +38,10 @@ export default class Game {
   }
 
   #testing() {
-
     if (!DEV_TOOLS_FLAG) {
       return;
     }
-
-    let g = new Graph();
-    g.generateRandomGraph();
-
-    // let nodes = [...g.graphList.keys()];
-    // for (let node of nodes) {
-    //   const x = Math.floor(node.position.x);
-    //   const y = Math.floor(node.position.y);
-    // }
-
-
-    // for (let node of nodes) {
-    //   const x = Math.floor(node.position.x);
-    //   const y = Math.floor(node.position.y);
-
-    //   for (let outgoingNode of g.graphList.get(node).keys()) {
-    //     const outgoingNodeX = Math.floor(outgoingNode.position.x);
-    //     const outgoingNodeY = Math.floor(outgoingNode.position.y);
-
-    //     ctx.beginPath();
-    //     ctx.moveTo(x, y);
-    //     ctx.lineTo(outgoingNodeX, outgoingNodeY);
-    //     ctx.lineWidth = 1;
-    //     ctx.strokeStyle = "blue";
-    //     ctx.stroke();
-    //   }
   }
-
-
-
-  
 
   #initGameLogic() {
     EventBus.on("input:grid-clicked", (targetPosition) => {
@@ -84,9 +52,16 @@ export default class Game {
       this.processCustomerDrop(payload);
     });
 
+    EventBus.on("worldMap:open-button-map", (payload) => {
+      this.processWorldMapOpenPress(payload);
+    });
+
 
     this.#initDevTools();
+  }
 
+  processWorldMapOpenPress(payload) {
+    EventBus.emit("worldMap:open", this.worldMap);
   }
 
   #initDevTools() {
