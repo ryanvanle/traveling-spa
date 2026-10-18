@@ -1,14 +1,14 @@
-import EventBus from './EventEmitter.js';
-import Player from './entities/Player.js';
-import Customer from './entities/Customer.js';
+import EventBus from "./EventEmitter.js";
+import Player from "./entities/Player.js";
+import Customer from "./entities/Customer.js";
 
-import DOMGameRenderer from './renderers/DOMGameRenderer.js';
-import DOMMapRenderer from './renderers/DOMMapRenderer.js';
+import DOMGameRenderer from "./renderers/DOMGameRenderer.js";
+import DOMMapRenderer from "./renderers/DOMMapRenderer.js";
 
-import Ship from './Ship.js';
-import { ACTION_TYPES } from './Constants.js';
+import Ship from "./Ship.js";
+import { ACTION_TYPES } from "./Constants.js";
 
-import WorldMap from './map/WorldMap.js';
+import WorldMap from "./map/WorldMap.js";
 
 const DEV_TOOLS_FLAG = true;
 
@@ -18,7 +18,7 @@ export default class Game {
     this.player = new Player(0, 0);
     this.worldMap = new WorldMap();
 
-    this.customers = [new Customer(1,1), new Customer(2,2), new Customer(3,3)];
+    this.customers = [new Customer(1, 1), new Customer(2, 2), new Customer(3, 3)];
     this.gameRenderer = new DOMGameRenderer(100);
     this.worldMapRenderer = new DOMMapRenderer();
     this.actionQueue = [];
@@ -56,7 +56,6 @@ export default class Game {
       this.processWorldMapOpenPress(payload);
     });
 
-
     this.#initDevTools();
   }
 
@@ -68,7 +67,7 @@ export default class Game {
     EventBus.on("devtools:mode-changed", () => {
       this.toggleDevTools();
     });
-    
+
     EventBus.on("devtools:tile", (targetPosition) => {
       this.processTileChange(targetPosition);
     });
@@ -78,7 +77,7 @@ export default class Game {
     let isCurrentlyDevMode = this.currentGameMode === "devtools";
     if (isCurrentlyDevMode) {
       this.currentGameMode = this.previousGameMode;
-      this.previousGameMode = ""; 
+      this.previousGameMode = "";
     } else {
       this.previousGameMode = this.currentGameMode;
       this.currentGameMode = "devtools";
@@ -86,20 +85,27 @@ export default class Game {
   }
 
   processTileChange(targetPosition) {
-    if (!(targetPosition && targetPosition.x != null && targetPosition.y != null)) {
+    const invalidPosition = !(
+      targetPosition &&
+      targetPosition.x != null &&
+      targetPosition.y != null
+    );
+
+    if (invalidPosition) {
       console.warn("processTileChange, targetPosition is", targetPosition);
       return;
     }
 
     let currentTile = this.ship.getTile(targetPosition.x, targetPosition.y);
 
-    currentTile.type === "floor" ? currentTile.setType("table") : currentTile.setType("floor"); 
+    currentTile.type === "floor" ? currentTile.setType("table") : currentTile.setType("floor");
+
     EventBus.emit("tile:updated", currentTile);
   }
 
   processCustomerDrop(payload) {
-    const droppedValidCustomer = this.customers.find(currnetCustomer => 
-      this.#isValidCustomerDrop(currnetCustomer, payload)
+    const droppedValidCustomer = this.customers.find((currnetCustomer) =>
+      this.#isValidCustomerDrop(currnetCustomer, payload),
     );
 
     if (!droppedValidCustomer) {
@@ -121,27 +127,32 @@ export default class Game {
 
     return tileData.getIsEntityPlaceable();
   }
-  
+
   processGridClick(targetPosition) {
     // input checks for player character
     const isWithinBounds = this.ship.isWithinBounds(targetPosition.x, targetPosition.y);
+
     if (!isWithinBounds) {
       console.debug("processGridClick: handle input not within game bounds");
       return;
     }
 
-    const isAtCurrentPosition = this.player.position.x === targetPosition.x && this.player.position.y === targetPosition.y;
-    const isDuplicateAction = this.actionQueue.some(action => action.target.x === targetPosition.x && action.target.y === targetPosition.y);
+    const isAtCurrentPosition =
+      this.player.position.x === targetPosition.x && this.player.position.y === targetPosition.y;
+
+    const isDuplicateAction = this.actionQueue.some(
+      (action) => action.target.x === targetPosition.x && action.target.y === targetPosition.y,
+    );
 
     if (isAtCurrentPosition || isDuplicateAction) {
       console.debug("processGridClick: Action Queue: duplicate action");
       return;
     }
-  
+
     let isMove = this.ship.isWalkableTile(targetPosition.x, targetPosition.y);
     let action = {
       type: isMove ? ACTION_TYPES.MOVE : ACTION_TYPES.INTERACT,
-      target: targetPosition
+      target: targetPosition,
     };
 
     if (this.currentGameMode === "devtools") {
@@ -155,9 +166,9 @@ export default class Game {
     this.processQueue();
   }
 
-   async executeMovement(targetPosition) {
+  async executeMovement(targetPosition) {
     let playerPosition = this.player.position;
-    let path = this.#findPath({x: playerPosition.x, y: playerPosition.y}, targetPosition);
+    let path = this.#findPath({ x: playerPosition.x, y: playerPosition.y }, targetPosition);
 
     if (!path) {
       console.debug("executeMovement, no path found");
@@ -167,7 +178,7 @@ export default class Game {
     for (let i = 1; i < path.length; i++) {
       const nextStep = path[i];
       this.player.updatePosition(nextStep, this.ship);
-      await new Promise(resolve => setTimeout(resolve, this.player.stats.speed));
+      await new Promise((resolve) => setTimeout(resolve, this.player.stats.speed));
     }
   }
 
@@ -200,19 +211,18 @@ export default class Game {
     this.isProcessing = false;
   }
 
-
   #findPath(start, end) {
     const directions = [
       [-1, 0], // left
       [1, 0], // right
       [0, -1], // top
-      [0, 1] // down
-    ]
+      [0, 1], // down
+    ];
 
     const queue = [start];
     const visited = new Set([start]);
     visited.add(`${start.x},${start.y}`);
-    
+
     const parentMap = {};
 
     // bfs
@@ -240,9 +250,9 @@ export default class Game {
         ) {
           visited.add(nextDirectionString);
           parentMap[nextDirectionString] = currentPosition;
-          queue.push({ x: nextDirectionX, y: nextDirectionY});
+          queue.push({ x: nextDirectionX, y: nextDirectionY });
         }
-      } 
+      }
     }
 
     return null;
@@ -258,5 +268,5 @@ export default class Game {
     }
 
     return path.reverse();
-  } 
+  }
 }

@@ -52,8 +52,8 @@ export default class NodeGenerator {
 
     const randomPosition = {
       x: this.getRandomInt(minOffset, maxOffset) + colOffset,
-      y: this.getRandomInt(minOffset, maxOffset) + rowOffset
-    }
+      y: this.getRandomInt(minOffset, maxOffset) + rowOffset,
+    };
 
     return randomPosition;
   }
@@ -71,4 +71,3 @@ export default class NodeGenerator {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
-

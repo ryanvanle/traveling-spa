@@ -15,7 +15,7 @@ class EventEmitter {
   emit(eventName, payload) {
     if (this.events[eventName]) {
       // console.debug("EventEmitter: emit recieved", eventName, payload);
-      this.events[eventName].forEach(listener => listener(payload));
+      this.events[eventName].forEach((listener) => listener(payload));
     }
   }
 }

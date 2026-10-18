@@ -42,7 +42,7 @@ export default class Chair extends Entity {
   }
 
   interactProp() {
-     // you cannot interact with a chair for example but can place them onto a chair which is different
+    // you cannot interact with a chair for example but can place them onto a chair which is different
     if (!this.canInteract) {
       return;
     }
@@ -52,12 +52,9 @@ export default class Chair extends Entity {
     //  -- matches customers intention (matches the object)
     //     -- this would also include them being done with the machine like
     //  -- is not already in use (idle)
-
   }
 
-  #updateState() {
-
-  }
+  #updateState() {}
 
   onTileEnter(tile) {
     tile.props.add(this.id);

@@ -41,25 +41,22 @@ export default class DOMMapRenderer {
       worldMapDialog.open ? worldMapDialog.close() : worldMapDialog.show();
       EventBus.emit("worldMap:open-button-map");
       // this.#updateMapElements()
-      
-      
-      // console.log("2", worldMapDialog.offsetHeight, worldMapDialog.offsetWidth);
 
+      // console.log("2", worldMapDialog.offsetHeight, worldMapDialog.offsetWidth);
     });
-  
+
     // this.container.addEventListener("click", (event) => {
-      // const targetPosition = this.getCoordsFromXY(event.clientX, event.clientY);
-      // EventBus.emit("input:grid-clicked", targetPosition);
+    // const targetPosition = this.getCoordsFromXY(event.clientX, event.clientY);
+    // EventBus.emit("input:grid-clicked", targetPosition);
     // });
 
     // this.#initDevToolsEvents();
   }
 
   initWorldMap(worldMap) {
-
     const worldMapContainer = document.createElement("dialog");
     worldMapContainer.id = "map";
-    
+
     const mapElementsContainer = document.createElement("div");
     mapElementsContainer.id = CONTENT_TAG;
 
@@ -85,8 +82,6 @@ export default class DOMMapRenderer {
     return edgeElement;
   }
 
-
-
   renderOpenMap(worldMap) {
     console.log("renderOpenMap", worldMap);
 
@@ -95,8 +90,8 @@ export default class DOMMapRenderer {
 
     const containerSize = {
       width: mapElement.offsetWidth,
-      height: mapElement.offsetHeight
-    }
+      height: mapElement.offsetHeight,
+    };
 
     const islands = worldMap.getIslands();
     const edges = worldMap.getAllEdges();
@@ -112,17 +107,9 @@ export default class DOMMapRenderer {
     }
   }
 
-  renderCloseMap(worldMap) {
+  renderCloseMap(worldMap) {}
 
-  }
+  #initDevToolsEvents() {}
 
-  #initDevToolsEvents() {
-
-  }
-
-  renderInitialEntities(player, customers) {
-
-  }
-
-
+  renderInitialEntities(player, customers) {}
 }

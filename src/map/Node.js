@@ -11,13 +11,14 @@ export default class Node {
     this.isPlayerPresent = false;
 
     this.position = {
-      "x": position.x,
-      "y": position.y,
-    }
+      x: position.x,
+      y: position.y,
+    };
   }
-  
+
   equals(targetNode) {
-    return this.node.position.x == targetNode.position.x &&
-           this.node.position.y == targetNode.position.y;
+    return (
+      this.node.position.x == targetNode.position.x && this.node.position.y == targetNode.position.y
+    );
   }
 }

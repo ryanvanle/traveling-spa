@@ -1,13 +1,13 @@
 const TYPE_LIST = {
-  "floor": {
-    isWalkable: true, 
+  floor: {
+    isWalkable: true,
     isEntityPlaceable: true,
   },
-  "table" : {
+  table: {
     isWalkable: false,
     isEntityPlaceable: false,
-  }
-}
+  },
+};
 
 export default class Tile {
   constructor(row, column, type = "floor") {
@@ -26,10 +26,9 @@ export default class Tile {
     return Array.from(this.props);
   }
 
-
   // TODO this is a whole logic since it'll be determined whats on the tile and the tile type itself.
   getIsEntityPlaceable() {
-    return this.isEntityPlaceable; 
+    return this.isEntityPlaceable;
   }
 
   setType(type) {

@@ -5,7 +5,7 @@ import Entity from "./Entity.js";
 export default class Customer extends Entity {
   constructor(startX, startY) {
     super(startX, startY);
-    this.stats = {}
+    this.stats = {};
     this.model = new CharacterModel(false);
     this.model.hair = ModelGenerator.generateRandomHair();
     this.model.features = ModelGenerator.generateRandomFeatures();

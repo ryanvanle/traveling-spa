@@ -17,7 +17,7 @@ class StateMachine {
     this.currentState = nextState;
     return this.currentState;
   }
-  
+
   reset(state) {
     const isValidState = Object.hasOwn(this.states, state);
     if (!isValidState) {
@@ -25,8 +25,8 @@ class StateMachine {
       return false;
     }
 
-    this.currentState = state; 
-    return true; 
+    this.currentState = state;
+    return true;
   }
 
   getCurrentState() {
@@ -37,7 +37,6 @@ class StateMachine {
     return this.states;
   }
 }
-
 
 // const exampleStateGraph = {
 //   state1: {
@@ -61,31 +60,31 @@ const exampleStateGraph = {
   state1: {
     functions: {
       onExit: () => {},
-      onEnter: () => {}
+      onEnter: () => {},
     },
     edges: {
       action1: "state2",
       action2: "state3",
-    }
+    },
   },
   state2: {
     functions: {
       onExit: () => {},
-      onEnter: () => {}
+      onEnter: () => {},
     },
     edges: {
       action1: "state1",
-      action2: "state3"
-    }
+      action2: "state3",
+    },
   },
   state3: {
     functions: {
       onExit: () => {},
-      onEnter: () => {}
+      onEnter: () => {},
     },
     edges: {
       action1: "state1",
-      action2: "state2"
-    }
-  }
-}
+      action2: "state2",
+    },
+  },
+};

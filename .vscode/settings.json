@@ -1,3 +1,30 @@
 {
-  "liveServer.settings.port": 5502
+  "liveServer.settings.port": 5502,
+
+  // custom css and js
+  "vscode_custom_css.imports": [
+    "file:///C:/Users/PC/Desktop/code/vscode-config/vscode-config-override.css",
+    "file:///C:/Users/PC/Desktop/code/vscode-config/vscode-config-override.js"
+  ],
+
+  "window.title": "${activeEditorShort}${activeEditorShort/./}",
+  "editor.scrollbar.horizontalScrollbarSize": 3,
+  "editor.scrollbar.verticalScrollbarSize": 3,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.tabSize": 2,
+  "editor.rulers": [
+    {
+      "column": 100,
+      "color": "#ffffff10"
+    }
+  ],
+
+  "files.trimTrailingWhitespace": true,
+
+  "workbench.tree.indent": 8,
+  "editor.lineNumbers": "on",
+  "editor.glyphMargin": true,
+  "editor.lineDecorationsWidth": 0,
+  "editor.lightbulb.enabled": "off",
+  "editor.formatOnSave": true,
 }

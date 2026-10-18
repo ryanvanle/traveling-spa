@@ -7,13 +7,13 @@ export default class CharacterModel {
       style: null,
       colorFill: "black",
       colorStroke: "black",
-    }
+    };
 
     this.features = {
       mouth: null,
       eyes: null,
       eyebrows: null,
-      skinColor: "white"
-    }
+      skinColor: "white",
+    };
   }
 }

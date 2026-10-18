@@ -15,7 +15,7 @@ export default class DOMGameRenderer {
 
   #setupListeners() {
     EventBus.on("entity:moved", (entity) => this.renderEntity(entity));
-    EventBus.on("queue:updated", (queue) => this.renderMarkers(queue));    
+    EventBus.on("queue:updated", (queue) => this.renderMarkers(queue));
     EventBus.on("tile:updated", (tile) => this.renderTile(tile));
   }
 
@@ -23,7 +23,7 @@ export default class DOMGameRenderer {
   init(ship, player, customers) {
     this.initGrid(ship);
     this.setupEvents();
-    this.renderInitialEntities(player, customers)
+    this.renderInitialEntities(player, customers);
   }
 
   setupEvents() {
@@ -40,7 +40,6 @@ export default class DOMGameRenderer {
   }
 
   #initDevToolsEvents() {
-
     let buttons = document.querySelectorAll("nav ul li button");
     buttons[0].addEventListener("click", (event) => {
       if (event.target.tagName === "BUTTON") {
@@ -65,39 +64,45 @@ export default class DOMGameRenderer {
 
     for (let i = 0; i < shipState.rows; i++) {
       for (let j = 0; j < shipState.columns; j++) {
-        let currentTile = this.#generateTile(i, j, this.tileSize, shipState.getTile(i, j), shipState.isWalkableTile(i, j));
+        let currentTile = this.#generateTile(
+          i,
+          j,
+          this.tileSize,
+          shipState.getTile(i, j),
+          shipState.isWalkableTile(i, j),
+        );
         shipContainer.appendChild(currentTile);
       }
     }
-    
+
     this.root.appendChild(shipContainer);
     this.container = shipContainer;
   }
 
   #generateTile(row, column, size, tileData, isWalkableTile) {
-      let tile = document.createElement("div");
-      tile.style.width = `${size}px`;
-      tile.style.height = `${size}px`;
-      tile.dataset.row = row;
-      tile.dataset.column = column;
-      
-      if (!tileData) {
-        console.warn("DOMGameRenderer: generateTile, tileData is null", tileData);
-        return;
-      }
+    let tile = document.createElement("div");
+    tile.style.width = `${size}px`;
+    tile.style.height = `${size}px`;
+    tile.dataset.row = row;
+    tile.dataset.column = column;
 
-      if (!isWalkableTile) {
-        currentTile.classList.add("blocked");
-      }
+    if (!tileData) {
+      console.warn("DOMGameRenderer: generateTile, tileData is null", tileData);
+      return;
+    }
 
-      tile.classList.add(this.#generateTileClassName(tileData.type));
-      this.#addTileEventListeners(tile);
-      return tile;
+    if (!isWalkableTile) {
+      currentTile.classList.add("blocked");
+    }
+
+    tile.classList.add(this.#generateTileClassName(tileData.type));
+    this.#addTileEventListeners(tile);
+    return tile;
   }
 
   #addTileEventListeners(tile) {
     tile.addEventListener("dragover", (event) => {
-      event.preventDefault(); 
+      event.preventDefault();
     });
 
     tile.addEventListener("drop", (event) => {
@@ -106,7 +111,6 @@ export default class DOMGameRenderer {
       const entityId = event.dataTransfer.getData("text/plain");
       const targetPosition = { x: parseInt(tile.dataset.row), y: parseInt(tile.dataset.column) };
       EventBus.emit("input:customer-dropped", { id: entityId, target: targetPosition });
-    
     });
   }
 
@@ -115,7 +119,7 @@ export default class DOMGameRenderer {
       console.warn("DOMGameRenderer: generateTileClassName is null", tileType);
       return null;
     }
-    
+
     return `${TILE_PREFIX}${tileType}`;
   }
 
@@ -136,8 +140,8 @@ export default class DOMGameRenderer {
     let newTileClassName = this.#generateTileClassName(tileData.type);
 
     let tileClasslist = Array.from(tileElement.classList)
-      .filter(className => className.includes(TILE_PREFIX))
-      .filter(className => !className.includes(newTileClassName));
+      .filter((className) => className.includes(TILE_PREFIX))
+      .filter((className) => !className.includes(newTileClassName));
 
     for (let tileClass of tileClasslist) {
       tileElement.classList.remove(tileClass);
@@ -145,7 +149,7 @@ export default class DOMGameRenderer {
 
     tileElement.classList.add(newTileClassName);
   }
-  
+
   getCoordsFromXY(clientX, clientY) {
     const rectangle = this.container.getBoundingClientRect();
     const x = clientX - rectangle.left;
@@ -153,7 +157,7 @@ export default class DOMGameRenderer {
 
     return {
       x: Math.floor(y / this.tileSize),
-      y: Math.floor(x / this.tileSize)
+      y: Math.floor(x / this.tileSize),
     };
   }
 
@@ -184,7 +188,7 @@ export default class DOMGameRenderer {
     }
   }
 
-  renderMarkers(actionQueue) { 
+  renderMarkers(actionQueue) {
     // remove all markers
     const existingMarkers = this.container.querySelectorAll(".action-marker");
     for (const tileElement of existingMarkers) {
@@ -197,16 +201,14 @@ export default class DOMGameRenderer {
       const tile = this.getTileElement(action.target.x, action.target.y);
       if (!tile) continue;
       tile.classList.add("action-marker");
-      tile.setAttribute('data-index', i + 1);
+      tile.setAttribute("data-index", i + 1);
     }
   }
 
   #buildCharacterDOM(entity) {
-
     const model = entity.model;
     let modelContainer = document.createElement("div");
     modelContainer.id = model.id;
-
 
     if (model.isPlayer) {
       modelContainer.classList.add("player-model");
@@ -234,7 +236,6 @@ export default class DOMGameRenderer {
         modelContainer.classList.remove("dragging");
       });
     }
-
 
     this.#generateCharacterDOM(model, modelContainer);
 
@@ -278,7 +279,7 @@ export default class DOMGameRenderer {
     hairFront.style.width = model.hair.style.front.width;
     hairFront.style.top = model.hair.style.front.top;
     hairFront.style.left = model.hair.style.front.left;
-    
+
     modelContainer.appendChild(head);
     modelContainer.appendChild(eyebrowLeft);
     modelContainer.appendChild(eyebrowRight);

@@ -1,4 +1,4 @@
-import EventBus from '../EventEmitter.js';
+import EventBus from "../EventEmitter.js";
 
 export default class Entity {
   constructor(startX, startY) {
@@ -43,11 +43,7 @@ export default class Entity {
   }
 
   // Placeholder methods for subclasses to override
-  onTileEnter(tile) {
+  onTileEnter(tile) {}
 
-  }
-
-  onTileLeave(tile) {
-
-  }
+  onTileLeave(tile) {}
 }

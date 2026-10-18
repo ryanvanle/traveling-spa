@@ -1,4 +1,4 @@
-import Graph from "./Graph.js"
+import Graph from "./Graph.js";
 
 export default class WorldMap {
   constructor() {
@@ -13,4 +13,4 @@ export default class WorldMap {
   getAllEdges() {
     return this.graph.getAllEdges();
   }
- }
+}

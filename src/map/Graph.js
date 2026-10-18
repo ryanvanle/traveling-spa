@@ -90,7 +90,7 @@ export default class Graph {
   }
 
   getNodeFromLabel(label) {
-    return this.labelToGraphNode.get(label)
+    return this.labelToGraphNode.get(label);
   }
 
   getNodes() {
@@ -112,19 +112,19 @@ export default class Graph {
 
     for (const [currentSourceNode, currentEdgeSet] of this.graphList.entries()) {
       for (const destinationNode of currentEdgeSet) {
-
         // undirected so we just need one way
-        const edgeKey = currentSourceNode.id < destinationNode.id
-          ? `${currentSourceNode.id}-${destinationNode.id}`
-          : `${destinationNode.id}-${currentSourceNode.id}`;
+        const edgeKey =
+          currentSourceNode.id < destinationNode.id
+            ? `${currentSourceNode.id}-${destinationNode.id}`
+            : `${destinationNode.id}-${currentSourceNode.id}`;
 
-          if (!seenEdges.has(edgeKey)) {
-            seenEdges.add(edgeKey);
-            edges.push({
-              source: currentSourceNode,
-              destination: destinationNode
-            });
-          }
+        if (!seenEdges.has(edgeKey)) {
+          seenEdges.add(edgeKey);
+          edges.push({
+            source: currentSourceNode,
+            destination: destinationNode,
+          });
+        }
       }
     }
 
@@ -177,7 +177,6 @@ export default class Graph {
       this.addEdge(nodeThree.label, nodeTwo.label);
     }
 
-
     // calculate spanning tree to ensure all nodes are connected and prune edges
     const allPossibleRemovedEdges = this.#generateSpanningTree();
     const PROBABILITY_TO_REMOVE = 0;
@@ -215,15 +214,23 @@ export default class Graph {
 
     for (let i = 0; i < triangles.length; i += 3) {
       triangleCoordinates.push([
-        {x: formattedPointsInput[2 * triangles[i]],  y: formattedPointsInput[2 * triangles[i] + 1]},
-        {x: formattedPointsInput[2 * triangles[i + 1]], y: formattedPointsInput[2 * triangles[i + 1] + 1]},
-        {x: formattedPointsInput[2 * triangles[i + 2]], y: formattedPointsInput[2 * triangles[i + 2] + 1]}
+        {
+          x: formattedPointsInput[2 * triangles[i]],
+          y: formattedPointsInput[2 * triangles[i] + 1],
+        },
+        {
+          x: formattedPointsInput[2 * triangles[i + 1]],
+          y: formattedPointsInput[2 * triangles[i + 1] + 1],
+        },
+        {
+          x: formattedPointsInput[2 * triangles[i + 2]],
+          y: formattedPointsInput[2 * triangles[i + 2] + 1],
+        },
       ]);
     }
 
     return triangleCoordinates;
   }
-
 
   /**
    * Kruskal Algorithm for unweighted spanning tree.
@@ -283,7 +290,7 @@ export default class Graph {
 
 class DisjointSet {
   constructor(size) {
-    this.parent = Array.from({length: size}, (_, i) => i);
+    this.parent = Array.from({ length: size }, (_, i) => i);
     this.rank = new Array(size).fill(0);
   }
 
@@ -304,8 +311,7 @@ class DisjointSet {
     const rootI = this.find(i);
     const rootJ = this.find(j);
 
-    if (rootI === rootJ)
-      return false;
+    if (rootI === rootJ) return false;
 
     if (this.rank[rootI] < this.rank[rootJ]) {
       this.parent[rootI] = rootJ;
