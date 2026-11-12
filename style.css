@@ -164,7 +164,6 @@ nav li {
 #world-map-content {
   width: 600px;
   height: 400px;
-  /* background-color: blue; */
   padding: 0;
   position: relative;
   box-sizing: border-box;
@@ -177,3 +176,24 @@ nav li {
   position: absolute;
   z-index: 1000;
 }
+
+.edge-default {
+  stroke: black;
+  stroke-width: 5px;
+  stroke-opacity: 0.5;
+}
+
+.edge-active {
+  stroke: black;
+  stroke-width: 5px;
+  stroke-opacity: 1;
+}
+
+
+.island-default {
+  r: 10px;
+  fill: red;
+  stroke: green;
+  stroke-width: 3px;
+}
+

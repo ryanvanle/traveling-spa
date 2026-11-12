@@ -8,7 +8,12 @@ export default class DOMMapRenderer {
   constructor() {
     this.root = document.getElementById(CONTAINER_TAG);
     this.container = null;
+    this.worldMap = null;
+
+    this.islandLabelToElement = new Map();
+    this.edgeLabelToElement = new Map();
     this.entityElements = new Map();
+
     this.#setupListeners();
   }
 
@@ -29,9 +34,7 @@ export default class DOMMapRenderer {
     }
 
     let buttons = document.querySelectorAll("nav ul li button");
-
     let worldMapButton = buttons[3];
-
     let worldMapDialog = document.getElementById("map");
     worldMapButton.addEventListener("click", (event) => {
       if (event.target.tagName === "BUTTON") {
@@ -55,6 +58,8 @@ export default class DOMMapRenderer {
   }
 
   initWorldMap(worldMap) {
+    this.worldMap = worldMap;
+
     const worldMapContainer = document.createElement("dialog");
     worldMapContainer.id = "map";
 
@@ -66,24 +71,39 @@ export default class DOMMapRenderer {
     this.container = worldMapContainer;
   }
 
-  #generateIsland(island, worldSize, containerSize) {
+  #generateIsland(islandData, worldSize, containerSize) {
     const islandElement = document.createElementNS(W3_SVG_URL, "circle");
 
-    const ISLAND_ATTRIBUTES = {
-      radius: 10,
-      fill: "red",
-      stroke: "green",
-      strokeWidth: 3,
-    };
+    islandElement.setAttribute("cx", islandData.position.x);
+    islandElement.setAttribute("cy", islandData.position.y);
+    islandElement.classList.add("island-default");
 
-    islandElement.setAttribute("cx", island.position.x);
-    islandElement.setAttribute("cy", island.position.y);
-    islandElement.setAttribute("r", ISLAND_ATTRIBUTES.radius);
-    islandElement.setAttribute("fill", ISLAND_ATTRIBUTES.fill);
-    islandElement.setAttribute("stroke", ISLAND_ATTRIBUTES.stroke);
-    islandElement.setAttribute("stroke-width", ISLAND_ATTRIBUTES.strokeWidth);
+    islandElement.addEventListener("mouseover", () => {
+      this.drawLinesFromIsland(islandData, islandElement);
+    });
 
     return islandElement;
+  }
+
+  drawLinesFromIsland(islandData, islandElement) {
+    const islandEdges = this.worldMap.getEdges(islandData);
+    for (const islandDestination of islandEdges) {
+      const edgeElement = this.#getEdgeElement(islandData, islandDestination);
+      edgeElement.classList.remove(...edgeElement.classList); // removes all classes
+      edgeElement.classList.add("edge-active");
+    }
+  }
+
+  #getEdgeElement(islandSource, islandDestination) {
+    // the graph is non-directional but not the labels
+    // so you have to check both ways to actually check if there's a key.
+    const edgeKeyOne = this.#generateEdgeLabel(islandSource, islandDestination);
+    const edgeKeyTwo = this.#generateEdgeLabel(islandDestination, islandSource);
+    const isValidKey = this.edgeLabelToElement.has(edgeKeyOne);
+
+    return isValidKey
+      ? this.edgeLabelToElement.get(edgeKeyOne)
+      : this.edgeLabelToElement.get(edgeKeyTwo);
   }
 
   #generateEdge(edge) {
@@ -95,18 +115,11 @@ export default class DOMMapRenderer {
 
   #generateLine(positionOne, positionTwo) {
     const line = document.createElementNS(W3_SVG_URL, "line");
-    const LINE_ATTRIBUTES = {
-      color: "purple",
-      strokeWidth: 5,
-    };
-
     line.setAttribute("x1", positionOne.x);
     line.setAttribute("y1", positionOne.y);
     line.setAttribute("x2", positionTwo.x);
     line.setAttribute("y2", positionTwo.y);
-    line.setAttribute("stroke", LINE_ATTRIBUTES.color);
-    line.setAttribute("stroke-width", LINE_ATTRIBUTES.strokeWidth);
-
+    line.classList.add("edge-default");
     return line;
   }
 
@@ -133,12 +146,23 @@ export default class DOMMapRenderer {
     for (const edge of edges) {
       const edgeElement = this.#generateEdge(edge, containerSize);
       svgContainer.appendChild(edgeElement);
+
+      const edgeLabel = this.#generateEdgeLabel(edge.source, edge.destination);
+      this.edgeLabelToElement.set(edgeLabel, edgeElement);
     }
 
     for (const island of islands) {
-      const islandNode = this.#generateIsland(island, containerSize);
-      svgContainer.appendChild(islandNode);
+      const islandElement = this.#generateIsland(island, containerSize);
+      svgContainer.appendChild(islandElement);
+      this.islandLabelToElement.set(island.label, islandElement);
     }
+  }
+
+  #generateEdgeLabel(islandSource, islandDestination) {
+    if (islandSource == null || islandDestination == null) {
+      console.log("one is null", islandSource, islandDestination);
+    }
+    return `edge-${islandSource.label}-${islandDestination.label}`;
   }
 
   renderCloseMap(worldMap) {}

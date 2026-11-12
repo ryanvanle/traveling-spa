@@ -13,4 +13,8 @@ export default class WorldMap {
   getAllEdges() {
     return this.graph.getAllEdges();
   }
+
+  getEdges(islandObject) {
+    return this.graph.getEdges(islandObject);
+  }
 }
