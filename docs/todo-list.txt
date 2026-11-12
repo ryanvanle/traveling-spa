@@ -10,6 +10,7 @@ todo:
       - this is alot harder than i expected so much math ;-;
         - implemented a version but will need to adjust.
     - map renderer
+      - needs to draw lines
     - node types
       - Random Event
       - Shop (with architypes)

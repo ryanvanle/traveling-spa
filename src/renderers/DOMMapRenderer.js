@@ -2,6 +2,7 @@ import EventBus from "../EventEmitter.js";
 
 const CONTAINER_TAG = "world-map-area";
 const CONTENT_TAG = "world-map-content";
+const W3_SVG_URL = "http://www.w3.org/2000/svg";
 
 export default class DOMMapRenderer {
   constructor() {
@@ -66,20 +67,47 @@ export default class DOMMapRenderer {
   }
 
   #generateIsland(island, worldSize, containerSize) {
-    const islandElement = document.createElement("div");
-    islandElement.classList.add("island");
+    const islandElement = document.createElementNS(W3_SVG_URL, "circle");
 
-    islandElement.style.top = `${island.position.y}px`;
-    islandElement.style.left = `${island.position.x}px`;
+    const ISLAND_ATTRIBUTES = {
+      radius: 10,
+      fill: "red",
+      stroke: "green",
+      strokeWidth: 3,
+    };
 
-    // console.log("generateIsland", island);
+    islandElement.setAttribute("cx", island.position.x);
+    islandElement.setAttribute("cy", island.position.y);
+    islandElement.setAttribute("r", ISLAND_ATTRIBUTES.radius);
+    islandElement.setAttribute("fill", ISLAND_ATTRIBUTES.fill);
+    islandElement.setAttribute("stroke", ISLAND_ATTRIBUTES.stroke);
+    islandElement.setAttribute("stroke-width", ISLAND_ATTRIBUTES.strokeWidth);
+
     return islandElement;
   }
 
   #generateEdge(edge) {
-    const edgeElement = document.createElement("div");
-    // console.log("generateEdge", edge);
-    return edgeElement;
+    const islandPositionOne = edge.source.position;
+    const islandPositionTwo = edge.destination.position;
+    const line = this.#generateLine(islandPositionOne, islandPositionTwo);
+    return line;
+  }
+
+  #generateLine(positionOne, positionTwo) {
+    const line = document.createElementNS(W3_SVG_URL, "line");
+    const LINE_ATTRIBUTES = {
+      color: "purple",
+      strokeWidth: 5,
+    };
+
+    line.setAttribute("x1", positionOne.x);
+    line.setAttribute("y1", positionOne.y);
+    line.setAttribute("x2", positionTwo.x);
+    line.setAttribute("y2", positionTwo.y);
+    line.setAttribute("stroke", LINE_ATTRIBUTES.color);
+    line.setAttribute("stroke-width", LINE_ATTRIBUTES.strokeWidth);
+
+    return line;
   }
 
   renderOpenMap(worldMap) {
@@ -93,17 +121,23 @@ export default class DOMMapRenderer {
       height: mapElement.offsetHeight,
     };
 
+    const svgContainer = document.createElementNS(W3_SVG_URL, "svg");
+    svgContainer.id = "world-map-draw-space";
+    mapElement.appendChild(svgContainer);
+    svgContainer.setAttribute("width", containerSize.width);
+    svgContainer.setAttribute("height", containerSize.height);
+
     const islands = worldMap.getIslands();
     const edges = worldMap.getAllEdges();
 
-    for (const island of islands) {
-      const islandNode = this.#generateIsland(island, containerSize);
-      mapElement.appendChild(islandNode);
-    }
-
     for (const edge of edges) {
       const edgeElement = this.#generateEdge(edge, containerSize);
-      mapElement.appendChild(edgeElement);
+      svgContainer.appendChild(edgeElement);
+    }
+
+    for (const island of islands) {
+      const islandNode = this.#generateIsland(island, containerSize);
+      svgContainer.appendChild(islandNode);
     }
   }
 

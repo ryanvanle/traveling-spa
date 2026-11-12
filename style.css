@@ -170,18 +170,10 @@ nav li {
   box-sizing: border-box;
 }
 
-.island {
-  width: 20px;
-  height: 20px;
-  padding: 5px;
+#world-map-draw-space {
+  width: 600px;
+  height: 400px;
+  padding: 0;
   position: absolute;
-  background-color: white;
   z-index: 1000;
-  border-radius: 100%;
-  border: 2px black solid;
-  transform: translate(-50%, -50%);
-}
-
-.edge {
-
 }
